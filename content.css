@@ -1,0 +1,47 @@
+/* Minimal content styles for extension integration */
+.relay-extension-active {
+  position: relative;
+}
+
+.relay-floating-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10000;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+  transition: transform 0.3s ease;
+}
+
+.relay-floating-indicator:hover {
+  transform: scale(1.1);
+}
+
+.relay-floating-indicator svg {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.relay-user-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}

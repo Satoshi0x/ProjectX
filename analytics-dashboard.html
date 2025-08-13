@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relay Chat Analytics Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .site-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .site-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .refresh-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .refresh-btn:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>Relay Chat Analytics Dashboard</h1>
+            <p>Real-time analytics for user behavior and Bitcoin wallet usage</p>
+            <button class="refresh-btn" onclick="loadAnalytics()">Refresh Data</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total Site Visits</div>
+                <div class="stat-value" id="totalVisits">-</div>
+                <div class="stat-label">Across all domains</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Wallet Users</div>
+                <div class="stat-value" id="walletUsers">-</div>
+                <div class="stat-label">Unique wallet users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Commerce Transactions</div>
+                <div class="stat-value" id="commerceTransactions">-</div>
+                <div class="stat-label">Bitcoin purchases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Total Volume</div>
+                <div class="stat-value" id="totalVolume">-</div>
+                <div class="stat-label">BTC transacted</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Top Visited Sites</h2>
+            <div class="site-list" id="siteList">
+                Loading...
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h2>Wallet Usage Breakdown</h2>
+            <div id="walletBreakdown">
+                Loading...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SERVER_URL = 'http://localhost:3001'
+
+        async function loadAnalytics() {
+            try {
+                // Load site analytics
+                const siteResponse = await fetch(`${SERVER_URL}/api/analytics/sites`)
+                const siteData = await siteResponse.json()
+                
+                // Load wallet analytics
+                const walletResponse = await fetch(`${SERVER_URL}/api/analytics/wallet`)
+                const walletData = await walletResponse.json()
+                
+                // Load commerce analytics
+                const commerceResponse = await fetch(`${SERVER_URL}/api/analytics/commerce`)
+                const commerceData = await commerceResponse.json()
+
+                // Update stats
+                document.getElementById('totalVisits').textContent = 
+                    siteData.reduce((sum, site) => sum + site.visits, 0).toLocaleString()
+                
+                document.getElementById('walletUsers').textContent = 
+                    walletData.totalUsers.toLocaleString()
+                
+                document.getElementById('commerceTransactions').textContent = 
+                    commerceData.totalTransactions.toLocaleString()
+                
+                document.getElementById('totalVolume').textContent = 
+                    commerceData.totalVolume.toFixed(8) + ' BTC'
+
+                // Update site list
+                const siteList = document.getElementById('siteList')
+                siteList.innerHTML = siteData.slice(0, 20).map(site => `
+                    <div class="site-item">
+                        <span>${site.domain}</span>
+                        <span>${site.visits} visits (${site.uniqueUsers} users)</span>
+                    </div>
+                `).join('')
+
+                // Update wallet breakdown
+                const walletBreakdown = document.getElementById('walletBreakdown')
+                walletBreakdown.innerHTML = Object.entries(walletData.actionBreakdown)
+                    .map(([action, count]) => `
+                        <div class="site-item">
+                            <span>${action.replace('_', ' ').toUpperCase()}</span>
+                            <span>${count} times</span>
+                        </div>
+                    `).join('')
+
+            } catch (error) {
+                console.error('Failed to load analytics:', error)
+            }
+        }
+
+        // Load analytics on page load
+        loadAnalytics()
+        
+        // Auto-refresh every 30 seconds
+        setInterval(loadAnalytics, 30000)
+    </script>
+</body>
+</html>

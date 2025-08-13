@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relay Chat Extension UI Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .demo-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .popup-demo {
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+        
+        .chat-widget-demo {
+            width: 300px;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            position: relative;
+        }
+        
+        .popup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 12px;
+            font-weight: 500;
+            color: #6c757d;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .tab-content {
+            padding: 15px;
+            height: 350px;
+            overflow-y: auto;
+        }
+        
+        .wallet-section {
+            margin-bottom: 20px;
+        }
+        
+        .wallet-section h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .address-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 11px;
+            word-break: break-all;
+            color: #6c757d;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            height: 280px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            position: relative;
+        }
+        
+        .message.own {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+        
+        .message.other {
+            background: #f1f3f4;
+            color: #333;
+        }
+        
+        .message-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .message-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .tip-btn {
+            background: #ffc107;
+            color: #212529;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .profile-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 13px;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        
+        .demo-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        .demo-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .demo-label {
+            font-weight: 600;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="demo-title">Relay Chat Extension UI Preview</h1>
+    
+    <div class="demo-labels">
+        <span class="demo-label">Extension Popup</span>
+        <span class="demo-label">Chat Widget (appears on websites)</span>
+    </div>
+    
+    <div class="demo-container">
+        <!-- Popup Demo -->
+        <div class="popup-demo">
+            <div class="popup-header">
+                Relay Chat Extension
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active">Chat</button>
+                <button class="tab">Wallet</button>
+                <button class="tab">Profile</button>
+            </div>
+            
+            <div class="tab-content">
+                <div class="wallet-section">
+                    <h4>Bitcoin Wallet</h4>
+                    <div class="address-display">
+                        bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+                    </div>
+                </div>
+                
+                <div class="wallet-section">
+                    <h4>Balance</h4>
+                    <div style="font-size: 18px; font-weight: 600; color: #28a745;">
+                        0.00234 BTC
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary">Generate New Wallet</button>
+                <button class="btn btn-success">Connect Wallet</button>
+                
+                <div class="wallet-section">
+                    <h4>Send Bitcoin</h4>
+                    <input type="text" placeholder="Recipient address" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <input type="number" placeholder="Amount (BTC)" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    <button class="btn btn-primary">Send Payment</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Widget Demo -->
+        <div class="chat-widget-demo">
+            <div class="chat-header">
+                <span>💬 example.com (3 users)</span>
+                <button style="background: none; border: none; color: white; cursor: pointer;">×</button>
+            </div>
+            
+            <div class="chat-messages">
+                <div class="message other">
+                    <strong>Alice:</strong> Hey everyone! 👋
+                    <button class="tip-btn">💰 Tip</button>
+                </div>
+                <div class="message other">
+                    <strong>Bob:</strong> This website is really cool!
+                    <button class="tip-btn">💰 Tip</button>
+                </div>
+                <div class="message own">
+                    <strong>You:</strong> I agree! Love the design
+                </div>
+                <div class="message other">
+                    <strong>Alice:</strong> Thanks for the Bitcoin tip! 🚀
+                    <button class="tip-btn">💰 Tip</button>
+                </div>
+            </div>
+            
+            <div class="message-input">
+                <input type="text" placeholder="Type a message...">
+                <button style="background: #667eea; color: white; border: none; padding: 8px 15px; border-radius: 20px; margin-left: 8px; cursor: pointer;">Send</button>
+            </div>
+        </div>
+    </div>
+    
+    <div style="margin-top: 30px; text-align: center; color: #6c757d;">
+        <p><strong>Features:</strong> Domain-based chat rooms • Bitcoin wallet integration • User profiles • Real-time messaging • Bitcoin tipping • Analytics tracking</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,485 @@
+/* Relay Chat Extension Styles */
+
+#relay-chat-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background: #4f46e5;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  z-index: 10000;
+  transition: all 0.3s ease;
+  color: white;
+}
+
+#relay-chat-toggle:hover {
+  background: #4338ca;
+  transform: scale(1.05);
+}
+
+#relay-chat-toggle.active {
+  background: #ef4444;
+}
+
+#relay-chat-toggle .relay-user-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#relay-chat-widget {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  width: 350px;
+  height: 500px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  display: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.relay-widget-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.relay-widget-header {
+  background: #4f46e5;
+  color: white;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.relay-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.relay-close-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.relay-close-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.relay-widget-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 68px);
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background: #f9fafb;
+}
+
+.welcome-message {
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.welcome-message p {
+  margin: 4px 0;
+}
+
+.message {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.message.own {
+  background: #4f46e5;
+  color: white;
+  margin-left: 40px;
+}
+
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.message.own .message-header {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.author {
+  font-weight: 600;
+}
+
+.time {
+  opacity: 0.7;
+}
+
+.message-text {
+  font-size: 14px;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* Added tip button styles */
+.tip-button {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: background 0.2s;
+}
+
+.tip-button:hover {
+  background: #d97706;
+}
+
+/* Added tip notification styles */
+.tip-notification {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+}
+
+.tip-notification-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #92400e;
+}
+
+.tip-notification-content .time {
+  margin-left: auto;
+  opacity: 0.7;
+}
+
+/* Added tip modal styles */
+.tip-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+}
+
+.tip-modal {
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+.tip-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tip-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.tip-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tip-modal-close:hover {
+  color: #374151;
+}
+
+.tip-modal-body {
+  padding: 20px;
+}
+
+.tip-modal-body p {
+  margin: 0 0 16px 0;
+  color: #374151;
+}
+
+.tip-amount-input {
+  margin-bottom: 16px;
+}
+
+.tip-amount-input label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.tip-amount-input input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.tip-amount-input input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.tip-preset-amounts {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tip-preset {
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tip-preset:hover {
+  background: #e5e7eb;
+}
+
+.tip-modal-footer {
+  padding: 20px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.tip-cancel-btn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.tip-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.tip-send-btn {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.tip-send-btn:hover {
+  background: #d97706;
+}
+
+.relay-input-container {
+  padding: 16px;
+  background: white;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 8px;
+}
+
+#message-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+#message-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.relay-send-button {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.relay-send-button:hover {
+  background: #4338ca;
+}
+
+.relay-send-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  #relay-chat-widget {
+    background: #1f2937;
+    color: white;
+  }
+
+  .messages-container {
+    background: #111827;
+  }
+
+  .message {
+    background: #374151;
+    color: white;
+  }
+
+  .tip-notification {
+    background: #451a03;
+    border-left-color: #f59e0b;
+  }
+
+  .tip-notification-content {
+    color: #fbbf24;
+  }
+
+  .tip-modal {
+    background: #1f2937;
+    color: white;
+  }
+
+  .tip-modal-header {
+    border-bottom-color: #374151;
+  }
+
+  .tip-modal-footer {
+    border-top-color: #374151;
+  }
+
+  .tip-amount-input input {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+
+  .tip-preset {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+
+  .tip-preset:hover {
+    background: #4b5563;
+  }
+
+  .relay-input-container {
+    background: #1f2937;
+    border-top-color: #374151;
+  }
+
+  #message-input {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+  }
+
+  #message-input::placeholder {
+    color: #9ca3af;
+  }
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+  #relay-chat-widget {
+    width: calc(100vw - 40px);
+    height: calc(100vh - 140px);
+    bottom: 100px;
+    right: 20px;
+    left: 20px;
+  }
+
+  .tip-modal {
+    width: calc(100vw - 40px);
+  }
+
+  .tip-preset-amounts {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relay Profiles</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #1f2937;
+      background: #f9fafb;
+    }
+    
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #4f46e5;
+      text-decoration: none;
+    }
+    
+    .main {
+      padding: 2rem 0;
+    }
+    
+    .profile-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .avatar {
+      width: 80px;
+      height: 80px;
+      background: #4f46e5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    
+    .profile-info h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+    
+    .username {
+      color: #6b7280;
+      font-size: 1rem;
+    }
+    
+    .profile-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .stat {
+      text-align: center;
+      padding: 1rem;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #4f46e5;
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+    
+    .websites {
+      margin: 1.5rem 0;
+    }
+    
+    .websites h3 {
+      margin-bottom: 0.5rem;
+      color: #374151;
+    }
+    
+    .website-link {
+      display: inline-block;
+      margin: 0.25rem 0.5rem 0.25rem 0;
+      padding: 0.5rem 1rem;
+      background: #4f46e5;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-size: 0.875rem;
+    }
+    
+    .website-link:hover {
+      background: #4338ca;
+    }
+    
+    .posts-section {
+      margin-top: 2rem;
+    }
+    
+    .posts-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .post {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .post-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .post-date {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+    
+    .post-content {
+      white-space: pre-wrap;
+      line-height: 1.7;
+    }
+    
+    .homepage-feed {
+      margin-top: 3rem;
+    }
+    
+    .feed-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    .feed-header h2 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .feed-subtitle {
+      color: #6b7280;
+    }
+    
+    .btc-address {
+      font-family: monospace;
+      background: #f3f4f6;
+      padding: 0.5rem;
+      border-radius: 4px;
+      word-break: break-all;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <a href="/" class="logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Relay Profiles
+      </a>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="container">
+      <!-- Profile display (shown when viewing specific user) -->
+      <div id="profile-view" style="display: none;">
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="profile-info">
+              <h1 id="user-display-name">User Name</h1>
+              <div class="username">@<span id="user-username">username</span></div>
+            </div>
+          </div>
+          
+          <div id="user-bio" class="profile-bio"></div>
+          
+          <div class="profile-stats">
+            <div class="stat">
+              <div class="stat-value" id="user-join-date">-</div>
+              <div class="stat-label">Member Since</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value" id="user-post-count">0</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">Active</div>
+              <div class="stat-label">Status</div>
+            </div>
+          </div>
+          
+          <div id="user-websites" class="websites" style="display: none;">
+            <h3>Websites & Links</h3>
+            <div id="website-links"></div>
+          </div>
+          
+          <div id="user-btc" class="websites" style="display: none;">
+            <h3>Bitcoin Address</h3>
+            <div class="btc-address" id="btc-address"></div>
+          </div>
+        </div>
+        
+        <div class="posts-section">
+          <div class="posts-header">
+            <h2>Posts by <span id="posts-author">User</span></h2>
+          </div>
+          <div id="user-posts"></div>
+        </div>
+      </div>
+      
+      <!-- Homepage feed (shown when viewing root) -->
+      <div id="homepage-feed" class="homepage-feed">
+        <div class="feed-header">
+          <h2>Latest Posts from Relay Community</h2>
+          <p class="feed-subtitle">Discover what Relay users are sharing across the web</p>
+        </div>
+        <div id="feed-posts"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Get username from URL path
+    const pathParts = window.location.pathname.split('/');
+    const isUserProfile = pathParts[1] === 'u' && pathParts[2];
+    const username = isUserProfile ? pathParts[2] : null;
+    
+    if (username) {
+      // Show specific user profile
+      showUserProfile(username);
+    } else {
+      // Show homepage feed
+      showHomepageFeed();
+    }
+    
+    function showUserProfile(username) {
+      document.getElementById('profile-view').style.display = 'block';
+      document.getElementById('homepage-feed').style.display = 'none';
+      
+      // This would normally fetch from a real backend
+      // For demo purposes, we'll show placeholder data
+      document.getElementById('user-display-name').textContent = `${username}'s Profile`;
+      document.getElementById('user-username').textContent = username;
+      document.getElementById('user-avatar').textContent = username.charAt(0).toUpperCase();
+      document.getElementById('posts-author').textContent = username;
+      
+      // Placeholder data
+      document.getElementById('user-join-date').textContent = 'Jan 2024';
+      document.getElementById('user-post-count').textContent = '5';
+      
+      // Show sample post
+      const postsContainer = document.getElementById('user-posts');
+      postsContainer.innerHTML = `
+        <div class="post">
+          <div class="post-header">
+            <h3 class="post-title">Welcome to my Relay profile!</h3>
+            <span class="post-date">2 days ago</span>
+          </div>
+          <div class="post-content">This is where my long-form posts would appear. Users can write detailed thoughts, share insights, and connect with the Relay community through these profile pages.
+          
+Each post supports multiple paragraphs and maintains formatting for easy reading.</div>
+        </div>
+      `;
+    }
+    
+    function showHomepageFeed() {
+      document.getElementById('profile-view').style.display = 'none';
+      document.getElementById('homepage-feed').style.display = 'block';
+      
+      // Show sample feed posts
+      const feedContainer = document.getElementById('feed-posts');
+      feedContainer.innerHTML = `
+        <div class="post">
+          <div class="post-header">
+            <h3 class="post-title">The Future of Domain-Based Communities</h3>
+            <span class="post-date">by @alice • 1 hour ago</span>
+          </div>
+          <div class="post-content">Relay is revolutionizing how we think about online communities. Instead of centralized platforms, we're creating micro-communities around every website on the internet...</div>
+        </div>
+        
+        <div class="post">
+          <div class="post-header">
+            <h3 class="post-title">Bitcoin Integration in Social Platforms</h3>
+            <span class="post-date">by @bob • 3 hours ago</span>
+          </div>
+          <div class="post-content">The integration of Bitcoin tipping in Relay opens up new possibilities for content creators and community members to support each other directly...</div>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
