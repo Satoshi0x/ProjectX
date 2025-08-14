@@ -1,11 +1,9 @@
-const chrome = window.chrome // Declare the chrome variable
+// Import the chrome variable
+const chrome = require("chrome")
 
 class RelayBackgroundService {
   constructor() {
-    this.serverUrl =
-      typeof window !== "undefined" && window.location.hostname === "localhost"
-        ? "http://localhost:3001"
-        : "https://v0-clone-relay-extension.vercel.app"
+    this.serverUrl = "https://v0-clone-relay-extension.vercel.app"
     this.init()
   }
 
