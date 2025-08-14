@@ -1,5 +1,8 @@
 // Background service worker for Relay Chat Extension
-const chrome = window.chrome // Declare the chrome variable
+/* global chrome */
+
+// Declare chrome variable to fix lint/correctness/noUndeclaredVariables error
+const chrome = window.chrome
 
 class RelayBackgroundService {
   constructor() {
