@@ -1,5 +1,5 @@
-// Import the chrome variable
-const chrome = require("chrome")
+// Background service worker for Relay Chat Extension
+const chrome = window.chrome // Declare the chrome variable
 
 class RelayBackgroundService {
   constructor() {

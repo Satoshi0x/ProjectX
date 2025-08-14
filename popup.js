@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let isConnected = false
 
   const serverUrl =
-    process.env.NODE_ENV === "production" ? "https://v0-clone-relay-extension.vercel.app" : "http://localhost:3001"
+    window.location.hostname === "localhost" ? "http://localhost:3001" : "https://v0-clone-relay-extension.vercel.app"
 
   const COINBASE_COMMERCE_API_KEY = "4d04bab4-bee2-4dfb-81ab-19e8f5dedcff"
   const COINBASE_COMMERCE_API_URL = "https://api.commerce.coinbase.com"

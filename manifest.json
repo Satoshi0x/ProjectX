@@ -5,6 +5,9 @@
   "description": "Chat with others on any website. Every domain gets its own chat community.",
   "permissions": ["activeTab", "storage", "notifications", "tabs"],
   "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' https://cdn.socket.io https://cdn.jsdelivr.net https://unpkg.com; object-src 'self';"
+  },
   "background": {
     "service_worker": "background.js"
   },
