@@ -56,6 +56,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentWallet = null
   let isConnected = false
 
+  const serverUrl =
+    process.env.NODE_ENV === "production" ? "https://your-relay-server.vercel.app" : "http://localhost:3001"
+
   chrome.storage.local.get(["anonymousUserId"], (result) => {
     if (result.anonymousUserId) {
       anonymousUserId = result.anonymousUserId
@@ -468,8 +471,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentProfile.posts.unshift(post)
     chrome.storage.local.set({ userProfile: currentProfile })
 
-    // Send post to server for homepage feed
-    fetch("http://localhost:3001/api/posts", {
+    fetch(`${serverUrl}/api/posts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -558,7 +560,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     script.src = "https://cdn.socket.io/4.7.2/socket.io.min.js"
     script.onload = () => {
       const io = window.io // Declare the io variable here
-      socket = io("http://localhost:3001") // Update this URL for production
+      socket = io(serverUrl)
       setupSocketListeners()
       joinRoom()
     }

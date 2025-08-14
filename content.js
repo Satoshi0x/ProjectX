@@ -3,6 +3,8 @@ class RelayContentScript {
   constructor() {
     this.domain = window.location.hostname
     this.anonymousUserId = this.generateAnonymousId()
+    this.serverUrl =
+      process.env.NODE_ENV === "production" ? "https://your-relay-server.vercel.app" : "http://localhost:3001"
     this.init()
   }
 
@@ -45,7 +47,7 @@ class RelayContentScript {
     script.src = "https://cdn.socket.io/4.7.2/socket.io.min.js"
     script.onload = () => {
       const io = window.io
-      this.socket = io("http://localhost:3001") // Update this URL for production
+      this.socket = io(this.serverUrl)
       this.setupSocketListeners()
       this.joinRoom()
     }

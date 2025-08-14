@@ -2,6 +2,8 @@ const chrome = window.chrome
 
 class RelayBackgroundService {
   constructor() {
+    this.serverUrl =
+      process.env.NODE_ENV === "production" ? "https://your-relay-server.vercel.app" : "http://localhost:3001"
     this.init()
   }
 
@@ -28,7 +30,7 @@ class RelayBackgroundService {
 
   async getRoomInfoFromServer(domain, sendResponse) {
     try {
-      const response = await fetch(`http://localhost:3001/api/rooms/${domain}/users`)
+      const response = await fetch(`${this.serverUrl}/api/rooms/${domain}/users`)
       const data = await response.json()
       sendResponse({ userCount: data.userCount })
     } catch (error) {

@@ -151,7 +151,9 @@
     </div>
 
     <script>
-        const SERVER_URL = 'http://localhost:3001'
+        const SERVER_URL = window.location.hostname === 'localhost' 
+            ? 'http://localhost:3001' 
+            : 'https://your-relay-server.vercel.app'
 
         async function loadAnalytics() {
             try {

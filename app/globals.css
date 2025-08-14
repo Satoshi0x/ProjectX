@@ -1,5 +1,5 @@
-@import 'tailwindcss';
-@import 'tw-animate-css';
+@import "tailwindcss";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -119,5 +119,36 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Added extension-specific styles for browser extension components */
+@layer components {
+  .extension-popup {
+    @apply bg-gray-900 text-white rounded-lg shadow-2xl;
+  }
+
+  .extension-tab {
+    @apply px-4 py-2 rounded-t-lg transition-all duration-200;
+  }
+
+  .extension-tab.active {
+    @apply bg-purple-600 text-white;
+  }
+
+  .extension-tab:not(.active) {
+    @apply bg-gray-700 text-gray-300 hover:bg-gray-600;
+  }
+
+  .chat-message {
+    @apply p-3 rounded-lg mb-2 backdrop-blur-sm;
+  }
+
+  .wallet-connected {
+    @apply bg-green-500/20 border border-green-500/30 text-green-400;
+  }
+
+  .wallet-disconnected {
+    @apply bg-red-500/20 border border-red-500/30 text-red-400;
   }
 }
