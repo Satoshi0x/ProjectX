@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relay Chat Extension - Visual Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .demo-header h1 {
+            color: #10b981;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .demo-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .demo-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .demo-card h3 {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 15px 20px;
+            font-size: 1.2rem;
+        }
+
+        .website-mockup {
+            height: 400px;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* GitHub mockup */
+        .github-mockup {
+            background: #0d1117;
+            color: #c9d1d9;
+            padding: 20px;
+        }
+
+        .github-header {
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .github-repo {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        /* News site mockup */
+        .news-mockup {
+            background: #fff;
+            padding: 20px;
+        }
+
+        .news-header {
+            border-bottom: 2px solid #e5e5e5;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .news-article {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        /* E-commerce mockup */
+        .ecommerce-mockup {
+            background: #fff;
+            padding: 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .product-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        /* Extension overlay */
+        .extension-overlay {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 12px;
+            border: 1px solid #10b981;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
+
+        .extension-header {
+            background: linear-gradient(135deg, #10b981, #059669);
+            padding: 15px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .extension-logo {
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .extension-tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #10b981;
+            border-bottom-color: #10b981;
+        }
+
+        .extension-content {
+            padding: 20px;
+            height: 380px;
+            overflow-y: auto;
+            color: white;
+        }
+
+        .chat-message {
+            background: #2a2a2a;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #10b981;
+        }
+
+        .wallet-section {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+        }
+
+        .balance-display {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #10b981;
+            margin-bottom: 15px;
+        }
+
+        .trending-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .user-count {
+            background: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .toggle-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            z-index: 999;
+        }
+
+        .features-list {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .feature-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .feature-content p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>Relay Chat Extension</h1>
+            <p>See how the extension appears on different websites with all features active</p>
+        </div>
+
+        <div class="demo-grid">
+            <!-- GitHub Demo -->
+            <div class="demo-card">
+                <h3>🐙 GitHub Repository</h3>
+                <div class="website-mockup github-mockup">
+                    <div class="github-header">
+                        <h2>📁 awesome-project</h2>
+                        <p>⭐ 1,234 stars • 🍴 567 forks</p>
+                    </div>
+                    <div class="github-repo">
+                        <p>📄 README.md</p>
+                        <p>📁 src/</p>
+                        <p>📄 package.json</p>
+                        <p>📄 .gitignore</p>
+                    </div>
+                    
+                    <div class="toggle-button">R</div>
+                    <div class="extension-overlay">
+                        <div class="extension-header">
+                            <div class="extension-logo">⚡ Relay Chat</div>
+                        </div>
+                        <div class="extension-tabs">
+                            <div class="tab active">Chat</div>
+                            <div class="tab">Wallet</div>
+                            <div class="tab">Trending</div>
+                        </div>
+                        <div class="extension-content">
+                            <div class="chat-message">
+                                <strong>alice_crypto:</strong> This repo looks interesting! Anyone tried it?
+                            </div>
+                            <div class="chat-message">
+                                <strong>dev_bob:</strong> Yeah, I'm using it in production. Works great!
+                            </div>
+                            <div class="chat-message">
+                                <strong>charlie_dev:</strong> The documentation could be better though
+                            </div>
+                            <div style="margin-top: 20px; text-align: center; color: #10b981;">
+                                💬 3 users chatting on github.com
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- News Site Demo -->
+            <div class="demo-card">
+                <h3>📰 News Website</h3>
+                <div class="website-mockup news-mockup">
+                    <div class="news-header">
+                        <h1>Tech News Daily</h1>
+                        <p>Latest technology news and updates</p>
+                    </div>
+                    <div class="news-article">
+                        <h3>Bitcoin Reaches New All-Time High</h3>
+                        <p>Cryptocurrency markets surge as institutional adoption increases...</p>
+                    </div>
+                    <div class="news-article">
+                        <h3>AI Revolution in Web Development</h3>
+                        <p>New tools are changing how developers build applications...</p>
+                    </div>
+                    
+                    <div class="toggle-button">R</div>
+                    <div class="extension-overlay">
+                        <div class="extension-header">
+                            <div class="extension-logo">⚡ Relay Chat</div>
+                        </div>
+                        <div class="extension-tabs">
+                            <div class="tab">Chat</div>
+                            <div class="tab active">Wallet</div>
+                            <div class="tab">Trending</div>
+                        </div>
+                        <div class="extension-content">
+                            <div class="wallet-section">
+                                <div class="balance-display">₿ 0.00234567</div>
+                                <p style="text-align: center; color: #888; margin-bottom: 15px;">
+                                    $156.78 USD
+                                </p>
+                                <button style="width: 100%; padding: 12px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                    💸 Send Bitcoin
+                                </button>
+                            </div>
+                            <div class="wallet-section">
+                                <h4 style="color: #10b981; margin-bottom: 10px;">Recent Transactions</h4>
+                                <div style="font-size: 0.9rem; color: #ccc;">
+                                    <p>• Received 0.001 BTC - 2 hours ago</p>
+                                    <p>• Sent 0.0005 BTC - 1 day ago</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- E-commerce Demo -->
+            <div class="demo-card">
+                <h3>🛒 E-commerce Store</h3>
+                <div class="website-mockup ecommerce-mockup">
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h2>🏪 TechStore</h2>
+                        <p>Premium electronics and gadgets</p>
+                    </div>
+                    <div class="product-grid">
+                        <div class="product-card">
+                            <div style="width: 100%; height: 80px; background: #f0f0f0; margin-bottom: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">📱</div>
+                            <h4>Smartphone Pro</h4>
+                            <p style="color: #10b981; font-weight: bold;">$899</p>
+                        </div>
+                        <div class="product-card">
+                            <div style="width: 100%; height: 80px; background: #f0f0f0; margin-bottom: 10px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">💻</div>
+                            <h4>Laptop Ultra</h4>
+                            <p style="color: #10b981; font-weight: bold;">$1,299</p>
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-button">R</div>
+                    <div class="extension-overlay">
+                        <div class="extension-header">
+                            <div class="extension-logo">⚡ Relay Chat</div>
+                        </div>
+                        <div class="extension-tabs">
+                            <div class="tab">Chat</div>
+                            <div class="tab">Wallet</div>
+                            <div class="tab active">Trending</div>
+                        </div>
+                        <div class="extension-content">
+                            <div style="text-align: center; margin-bottom: 20px;">
+                                <div style="font-size: 1.5rem; color: #10b981;">🔥 1,247 users active</div>
+                            </div>
+                            <h4 style="color: #10b981; margin-bottom: 15px;">Top Sites Right Now</h4>
+                            <div class="trending-item">
+                                <span>🐙 github.com</span>
+                                <span class="user-count">342</span>
+                            </div>
+                            <div class="trending-item">
+                                <span>📰 news.ycombinator.com</span>
+                                <span class="user-count">189</span>
+                            </div>
+                            <div class="trending-item">
+                                <span>🛒 amazon.com</span>
+                                <span class="user-count">156</span>
+                            </div>
+                            <div class="trending-item">
+                                <span>🐦 twitter.com</span>
+                                <span class="user-count">134</span>
+                            </div>
+                            <div class="trending-item">
+                                <span>📺 youtube.com</span>
+                                <span class="user-count">98</span>
+                            </div>
+                            <div style="margin-top: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px;">
+                                <h5 style="color: #10b981; margin-bottom: 10px;">Live Activity</h5>
+                                <p style="font-size: 0.8rem; color: #ccc;">• alice_crypto tipped 0.001 BTC on coinbase.com</p>
+                                <p style="font-size: 0.8rem; color: #ccc;">• dev_bob joined chat on github.com</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Demo -->
+            <div class="demo-card">
+                <h3>🐦 Social Media Platform</h3>
+                <div class="website-mockup" style="background: #15202b; color: #fff; padding: 20px;">
+                    <div style="border-bottom: 1px solid #38444d; padding-bottom: 15px; margin-bottom: 20px;">
+                        <h2 style="color: #1da1f2;">🐦 SocialNet</h2>
+                        <p style="color: #8899a6;">What's happening?</p>
+                    </div>
+                    <div style="background: #192734; border-radius: 12px; padding: 15px; margin-bottom: 15px;">
+                        <p><strong>@crypto_alice:</strong> Bitcoin is looking bullish today! 🚀</p>
+                        <div style="margin-top: 10px; color: #8899a6; font-size: 0.9rem;">
+                            💬 12 🔄 34 ❤️ 89
+                        </div>
+                    </div>
+                    <div style="background: #192734; border-radius: 12px; padding: 15px;">
+                        <p><strong>@dev_bob:</strong> Just deployed my new app using the latest framework!</p>
+                        <div style="margin-top: 10px; color: #8899a6; font-size: 0.9rem;">
+                            💬 5 🔄 12 ❤️ 23
+                        </div>
+                    </div>
+                    
+                    <div class="toggle-button">R</div>
+                    <div class="extension-overlay">
+                        <div class="extension-header">
+                            <div class="extension-logo">⚡ Relay Chat</div>
+                        </div>
+                        <div class="extension-tabs">
+                            <div class="tab active">Chat</div>
+                            <div class="tab">Wallet</div>
+                            <div class="tab">Trending</div>
+                        </div>
+                        <div class="extension-content">
+                            <div class="chat-message">
+                                <strong>crypto_enthusiast:</strong> Anyone else seeing this Bitcoin pump? 📈
+                            </div>
+                            <div class="chat-message">
+                                <strong>trader_joe:</strong> Yeah! Perfect time to tip some sats ⚡
+                                <div style="margin-top: 8px;">
+                                    <button style="background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                                        💰 Tip 0.001 BTC
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chat-message">
+                                <strong>hodler_mike:</strong> This extension makes tipping so easy!
+                            </div>
+                            <div style="margin-top: 20px;">
+                                <input type="text" placeholder="Type your message..." style="width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444; border-radius: 6px; color: white;">
+                                <button style="width: 100%; margin-top: 10px; padding: 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                                    Send Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="features-list">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">🚀 Extension Features</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div>
+                    <div class="feature-content">
+                        <h4>Domain-Based Chat</h4>
+                        <p>Chat with other users visiting the same website in real-time</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">₿</div>
+                    <div class="feature-content">
+                        <h4>Bitcoin Wallet</h4>
+                        <p>Send and receive Bitcoin with real transaction broadcasting</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-content">
+                        <h4>Live Analytics</h4>
+                        <p>See trending sites and active user counts updated every 10 minutes</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🛒</div>
+                    <div class="feature-content">
+                        <h4>Coinbase Commerce</h4>
+                        <p>One-click Bitcoin payments on supported e-commerce sites</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-content">
+                        <h4>User Authentication</h4>
+                        <p>Secure registration with email, password, and custom alias</p>
+                    </div>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">📱</div>
+                    <div class="feature-content">
+                        <h4>Draggable Interface</h4>
+                        <p>Resizable popup that can be positioned anywhere on the page</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
