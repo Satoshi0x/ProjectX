@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <style>
     body {
-      width: 380px;
+      width: 400px;
+      min-height: 500px;
+      max-height: 800px;
       height: 600px;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -12,6 +14,146 @@
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       color: #e2e8f0;
       overflow: hidden;
+      resize: vertical;
+      position: relative;
+    }
+    
+    /* Added authentication container styles */
+    #auth-container {
+      display: none;
+      height: 100vh;
+      background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .auth-logo {
+      width: 64px;
+      height: 64px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 20px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .auth-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: white;
+    }
+    
+    .auth-subtitle {
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+    }
+    
+    .auth-form {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      margin-bottom: 16px;
+    }
+    
+    .form-group {
+      margin-bottom: 16px;
+    }
+    
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: rgba(255,255,255,0.8);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.1);
+      color: white;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: all 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+    }
+    
+    .form-input::placeholder {
+      color: rgba(255,255,255,0.4);
+    }
+    
+    .auth-button {
+      width: 100%;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+    
+    .auth-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
+    }
+    
+    .auth-switch {
+      text-align: center;
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    .auth-switch a {
+      color: #7c3aed;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    
+    .auth-switch a:hover {
+      color: #a855f7;
+    }
+    
+    #main-content {
+      display: block;
+    }
+    
+    /* Added resize handle for adjustable height */
+    .resize-handle {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      cursor: ns-resize;
+      opacity: 0.3;
+      transition: opacity 0.2s;
+    }
+    
+    .resize-handle:hover {
+      opacity: 0.6;
     }
     
     .header {
@@ -98,15 +240,17 @@
     .tab-content {
       display: none;
       padding: 20px;
-      height: calc(600px - 140px);
+      height: calc(100vh - 200px);
+      min-height: 300px;
       overflow-y: auto;
+      flex: 1;
     }
     
     .tab-content.active {
       display: block;
     }
     
-    /* Added integrated chat interface */
+    /* Chat container styles */
     .chat-container {
       height: 100%;
       display: flex;
@@ -148,6 +292,7 @@
       overflow-y: auto;
       margin-bottom: 16px;
       padding-right: 8px;
+      min-height: 200px;
     }
     
     .message {
@@ -488,185 +633,288 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(255,255,255,0.3);
     }
+    
+    /* Trending tab styles */
+    .trending-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .active-users {
+      display: flex;
+      align-items: center;
+    }
+    
+    .active-count {
+      font-weight: 700;
+      color: #667eea;
+      font-size: 20px;
+      margin-right: 8px;
+    }
+    
+    .active-label {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    .last-updated {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+    }
+    
+    .trending-section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-size: 18px;
+      color: white;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    
+    .trending-list {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .daily-stats {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .stat-card {
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+    }
+    
+    .stat-number {
+      font-size: 24px;
+      color: #667eea;
+      font-weight: 700;
+    }
+    
+    .activity-feed {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
+  <!-- Added authentication container that shows first -->
+  <div id="auth-container">
+    <div class="auth-header">
+      <div class="auth-logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="auth-title">Welcome to Relay Chat</h2>
+      <p class="auth-subtitle">Create an account to get started</p>
     </div>
-    <h1>Relay Chat</h1>
-    <p class="subtitle">Domain-based communities</p>
+
+    <!-- Registration Form -->
+    <div class="auth-form" id="registration-form">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="reg-email" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="reg-password" placeholder="Choose a secure password" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Choose Your Alias</label>
+        <input type="text" class="form-input" id="reg-alias" placeholder="YourAlias" maxlength="20" required>
+      </div>
+      <button class="auth-button" id="register-btn">Create Account</button>
+      <div class="auth-switch">
+        Already have an account? <a href="#" id="show-login">Sign In</a>
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <div class="auth-form" id="login-form" style="display: none;">
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input type="password" class="form-input" id="login-password" placeholder="Your password" required>
+      </div>
+      <button class="auth-button" id="login-btn">Sign In</button>
+      <div class="auth-switch">
+        Don't have an account? <a href="#" id="show-register">Create Account</a>
+      </div>
+    </div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" data-tab="chat">💬 Chat</button>
-    <button class="tab" data-tab="wallet">₿ Wallet</button>
-    <button class="tab" data-tab="profile">👤 Profile</button>
-  </div>
-
-  <!-- Integrated chat directly into popup -->
-  <div class="tab-content active" id="chat-tab">
-    <div class="chat-container">
-      <div class="chat-header">
-        <div class="domain-info">
-          <span class="domain-name" id="current-domain">Loading...</span>
-          <span class="user-count" id="user-count">0 users</span>
-        </div>
+  <!-- Main content shows after authentication -->
+  <div id="main-content" style="display: none;">
+    <div class="header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
-
-      <div class="chat-messages" id="chat-messages">
-        <!-- Messages will be populated here -->
-      </div>
-
-      <div class="chat-input-container">
-        <input type="text" class="chat-input" id="message-input" placeholder="Type a message..." maxlength="500">
-        <button class="send-button" id="send-message">Send</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bitcoin wallet tab content -->
-  <div class="tab-content" id="wallet-tab">
-    <div class="warning">
-      ⚠️ <strong>Security Warning:</strong> Write down your mnemonic phrase and store it safely. Never share it with anyone. You are responsible for your Bitcoin security.
+      <h1>Relay Chat</h1>
+      <p class="subtitle">Domain-based communities</p>
     </div>
 
-    <div id="wallet-setup" style="display: none;">
-      <div class="actions">
-        <button class="primary-button" id="generate-wallet">Generate New Wallet</button>
-        <button id="import-wallet">Import Existing Wallet</button>
+    <div class="tabs">
+      <button class="tab active" data-tab="chat">💬 Chat</button>
+      <button class="tab" data-tab="wallet">₿ Wallet</button>
+      <button class="tab" data-tab="trending">📊 Trending</button>
+    </div>
+
+    <!-- Integrated chat directly into popup -->
+    <div class="tab-content active" id="chat-tab">
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="domain-info">
+            <span class="domain-name" id="current-domain">Loading...</span>
+            <span class="user-count" id="user-count">0 users</span>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+          <!-- Messages will be populated here -->
+        </div>
+
+        <div class="chat-input-container">
+          <input type="text" class="chat-input" id="message-input" placeholder="Type a message..." maxlength="500">
+          <button class="send-button" id="send-message">Send</button>
+        </div>
       </div>
     </div>
 
-    <div id="wallet-display" style="display: none;">
-      <div class="stats">
-        <div class="stat-item">
-          <span class="stat-label">Status:</span>
-          <span class="stat-value" id="wallet-status">Disconnected</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Address:</span>
-          <span class="stat-value" id="wallet-address">-</span>
-        </div>
+    <!-- Bitcoin wallet tab content -->
+    <div class="tab-content" id="wallet-tab">
+      <div class="warning">
+        ⚠️ <strong>Security Warning:</strong> Write down your mnemonic phrase and store it safely. Never share it with anyone. You are responsible for your Bitcoin security.
       </div>
 
-      <div class="balance" id="wallet-balance">0.00000000 BTC</div>
-
-      <div class="actions">
-        <button class="primary-button" id="connect-wallet">Connect</button>
-        <button id="send-bitcoin">Send Bitcoin</button>
-        <button id="show-mnemonic">Show Mnemonic</button>
-        <button id="reset-wallet">Reset Wallet</button>
-        <!-- Added blockchain explorer button -->
-        <button class="explorer-button" id="view-transactions">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          View All Transactions on Blockchain Explorer
-        </button>
-      </div>
-
-      <div class="send-form" id="send-form">
-        <div class="form-group">
-          <label class="form-label">Recipient Address:</label>
-          <input type="text" class="form-input" id="recipient-address" placeholder="bc1...">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Amount (BTC):</label>
-          <input type="number" class="form-input" id="send-amount" placeholder="0.00000000" step="0.00000001">
-        </div>
+      <div id="wallet-setup" style="display: none;">
         <div class="actions">
-          <button class="primary-button" id="confirm-send">Send Transaction</button>
-          <button id="cancel-send">Cancel</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="mnemonic-display" style="display: none;">
-      <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #e2e8f0;">Your Mnemonic Phrase</h3>
-      <div class="mnemonic-display" id="mnemonic-words"></div>
-      <div class="actions">
-        <button id="copy-mnemonic">Copy to Clipboard</button>
-        <button id="hide-mnemonic">Hide</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Profile tab content -->
-  <div class="tab-content" id="profile-tab">
-    <div id="profile-setup" style="display: none;">
-      <div class="form-group">
-        <label class="form-label">Choose Username:</label>
-        <input type="text" class="form-input" id="profile-username" placeholder="your-username" maxlength="20">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Display Name:</label>
-        <input type="text" class="form-input" id="profile-display-name" placeholder="Your Display Name" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Bio:</label>
-        <textarea class="form-input" id="profile-bio" placeholder="Tell others about yourself..." rows="3" maxlength="200"></textarea>
-      </div>
-      <div class="actions">
-        <button class="primary-button" id="create-profile">Create Profile</button>
-      </div>
-    </div>
-
-    <div id="profile-display" style="display: none;">
-      <div class="stats">
-        <div class="stat-item">
-          <span class="stat-label">Username:</span>
-          <span class="stat-value" id="display-username">-</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Display Name:</span>
-          <span class="stat-value" id="display-name">-</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Member Since:</span>
-          <span class="stat-value" id="join-date">-</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Bitcoin Address:</span>
-          <span class="stat-value" id="profile-btc-address">Connect wallet first</span>
+          <button class="primary-button" id="generate-wallet">Generate New Wallet</button>
+          <button id="import-wallet">Import Existing Wallet</button>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Website/Blog URLs (one per line):</label>
-        <textarea class="form-input" id="profile-websites" placeholder="https://yourwebsite.com&#10;https://yourblog.com" rows="3"></textarea>
-      </div>
-
-      <div class="actions">
-        <button class="primary-button" id="open-profile-page">Open My Profile Page</button>
-        <button id="create-post">Create New Post</button>
-        <button id="update-profile">Update Profile</button>
-        <button id="reset-profile">Reset Profile</button>
-      </div>
-
-      <div class="send-form" id="post-form">
-        <div class="form-group">
-          <label class="form-label">Post Title:</label>
-          <input type="text" class="form-input" id="post-title" placeholder="Your post title..." maxlength="100">
+      <div id="wallet-display" style="display: none;">
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-label">Status:</span>
+            <span class="stat-value" id="wallet-status">Disconnected</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Address:</span>
+            <span class="stat-value" id="wallet-address">-</span>
+          </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Post Content:</label>
-          <textarea class="form-input" id="post-content" placeholder="Write your long-form post here..." rows="6" maxlength="2000"></textarea>
-        </div>
+
+        <div class="balance" id="wallet-balance">0.00000000 BTC</div>
+        <div class="balance" id="wallet-balance-usd" style="font-size: 14px; color: rgba(255,255,255,0.6);">≈ $0.00 USD</div>
+
         <div class="actions">
-          <button class="primary-button" id="publish-post">Publish Post</button>
-          <button id="cancel-post">Cancel</button>
+          <button class="primary-button" id="connect-wallet">Connect</button>
+          <button id="send-bitcoin">Send Bitcoin</button>
+          <button id="show-mnemonic">Show Mnemonic</button>
+          <button id="reset-wallet">Reset Wallet</button>
+          <!-- Added blockchain explorer button -->
+          <button class="explorer-button" id="view-transactions">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            View All Transactions on Blockchain Explorer
+          </button>
+        </div>
+
+        <div class="send-form" id="send-form">
+          <div class="form-group">
+            <label class="form-label">Recipient Address:</label>
+            <input type="text" class="form-input" id="recipient-address" placeholder="bc1...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (BTC):</label>
+            <input type="number" class="form-input" id="send-amount" placeholder="0.00000000" step="0.00000001">
+          </div>
+          <div class="actions">
+            <button class="primary-button" id="confirm-send">Send Transaction</button>
+            <button id="cancel-send">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="mnemonic-display" style="display: none;">
+        <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #e2e8f0;">Your Mnemonic Phrase</h3>
+        <div class="mnemonic-display" id="mnemonic-words"></div>
+        <div class="actions">
+          <button id="copy-mnemonic">Copy to Clipboard</button>
+          <button id="hide-mnemonic">Hide</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trending tab content -->
+    <div class="tab-content" id="trending-tab">
+      <div class="trending-header">
+        <div class="active-users">
+          <span class="active-count" id="total-active-users">0</span>
+          <span class="active-label">users active</span>
+        </div>
+        <div class="last-updated" id="last-updated">Updated now</div>
+      </div>
+
+      <div class="trending-section">
+        <h3 class="section-title">🔥 Top Active Domains</h3>
+        <div class="trending-list" id="trending-domains">
+          <!-- Trending domains will be populated here -->
+        </div>
+      </div>
+
+      <div class="trending-section">
+        <h3 class="section-title">📈 Today's Activity</h3>
+        <div class="daily-stats" id="daily-stats">
+          <div class="stat-card">
+            <div class="stat-number" id="daily-messages">0</div>
+            <div class="stat-label">Messages Sent</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="daily-tips">0</div>
+            <div class="stat-label">Bitcoin Tips</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="daily-domains">0</div>
+            <div class="stat-label">Domains Visited</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trending-section">
+        <h3 class="section-title">⚡ Real-time Activity</h3>
+        <div class="activity-feed" id="activity-feed">
+          <!-- Real-time activity will be populated here -->
         </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">
-    <a href="#" id="about">About Relay Chat</a>
-  </div>
+  <div class="resize-handle" id="resize-handle"></div>
 
   <script src="https://unpkg.com/bitcoinjs-lib@6.1.5/dist/bitcoinjs-lib.min.js"></script>
   <script src="https://unpkg.com/bip39@3.1.0/dist/index.js"></script>

@@ -47,9 +47,41 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Declare chrome variable
   const chrome = window.chrome
 
-  // Import bip39 and bitcoin libraries
-  const bip39 = require("bip39")
-  const bitcoin = require("bitcoinjs-lib")
+  let bip39, bitcoin
+
+  let trendingUpdateInterval = null
+  const TRENDING_UPDATE_INTERVAL = 10 * 60 * 1000 // 10 minutes
+
+  // Load libraries dynamically
+  await loadBitcoinLibraries()
+
+  async function loadBitcoinLibraries() {
+    return new Promise((resolve) => {
+      // Load bip39 library
+      const bip39Script = document.createElement("script")
+      bip39Script.src = "https://cdn.jsdelivr.net/npm/bip39@3.1.0/src/index.js"
+
+      // Load bitcoinjs-lib
+      const bitcoinScript = document.createElement("script")
+      bitcoinScript.src = "https://cdn.jsdelivr.net/npm/bitcoinjs-lib@6.1.5/dist/bitcoinjs-lib.min.js"
+
+      let scriptsLoaded = 0
+      const onScriptLoad = () => {
+        scriptsLoaded++
+        if (scriptsLoaded === 2) {
+          bip39 = window.bip39
+          bitcoin = window.bitcoin
+          resolve()
+        }
+      }
+
+      bip39Script.onload = onScriptLoad
+      bitcoinScript.onload = onScriptLoad
+
+      document.head.appendChild(bip39Script)
+      document.head.appendChild(bitcoinScript)
+    })
+  }
 
   let currentProfile = null
   let anonymousUserId = null
@@ -57,7 +89,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   let isConnected = false
 
   const serverUrl =
-    process.env.NODE_ENV === "production" ? "https://your-relay-server.vercel.app" : "http://localhost:3001"
+    process.env.NODE_ENV === "production" ? "https://v0-clone-relay-extension.vercel.app" : "http://localhost:3001"
+
+  const COINBASE_COMMERCE_API_KEY = "4d04bab4-bee2-4dfb-81ab-19e8f5dedcff"
+  const COINBASE_COMMERCE_API_URL = "https://api.commerce.coinbase.com"
+  const COINBASE_MERCHANT_ID = "merchant_your_id_here" // Replace with your actual merchant ID
+  const SERVER_URL = serverUrl // Define SERVER_URL for webhook usage
+
+  // Authentication state management
+  let currentUser = null
+  let isAuthenticated = false
+
+  await checkAuthenticationStatus()
+  if (isAuthenticated) {
+    showMainContent()
+    initializeTabs()
+  } else {
+    showAuthForms()
+  }
 
   chrome.storage.local.get(["anonymousUserId"], (result) => {
     if (result.anonymousUserId) {
@@ -68,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   })
 
-  function trackWalletUsage(action) {
+  function trackWalletUsage(action, details = {}) {
     if (anonymousUserId) {
       // Send to content script to relay to server
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -78,34 +127,169 @@ document.addEventListener("DOMContentLoaded", async () => {
             action: action,
             anonymousUserId: anonymousUserId,
             timestamp: Date.now(),
+            details: details,
           })
         }
       })
     }
   }
 
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      const targetTab = tab.dataset.tab
-
-      // Update active tab
-      tabs.forEach((t) => t.classList.remove("active"))
-      tab.classList.add("active")
-
-      // Update active content
-      tabContents.forEach((content) => content.classList.remove("active"))
-      document.getElementById(`${targetTab}-tab`).classList.add("active")
-
-      // Initialize wallet tab if selected
-      if (targetTab === "wallet") {
-        initializeWalletTab()
-        trackWalletUsage("opened")
+  // Authentication functions
+  async function checkAuthenticationStatus() {
+    try {
+      const result = await chrome.storage.local.get(["currentUser", "authToken"])
+      if (result.currentUser && result.authToken) {
+        currentUser = result.currentUser
+        isAuthenticated = true
+        return true
       }
-      if (targetTab === "profile") {
-        initializeProfileTab()
+    } catch (error) {
+      console.error("Error checking auth status:", error)
+    }
+    return false
+  }
+
+  function showAuthForms() {
+    document.getElementById("auth-container").style.display = "block"
+    document.getElementById("main-content").style.display = "none"
+  }
+
+  function showMainContent() {
+    document.getElementById("auth-container").style.display = "none"
+    document.getElementById("main-content").style.display = "block"
+  }
+
+  // Registration functionality
+  document.getElementById("register-btn").addEventListener("click", async () => {
+    const email = document.getElementById("reg-email").value.trim()
+    const password = document.getElementById("reg-password").value
+    const alias = document.getElementById("reg-alias").value.trim()
+
+    if (!email || !password || !alias) {
+      alert("Please fill in all fields")
+      return
+    }
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters")
+      return
+    }
+
+    if (!/^[a-zA-Z0-9_-]+$/.test(alias)) {
+      alert("Alias can only contain letters, numbers, underscores, and hyphens")
+      return
+    }
+
+    try {
+      const response = await fetch(`${serverUrl}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, alias, anonymousUserId }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        currentUser = data.user
+        isAuthenticated = true
+
+        await chrome.storage.local.set({
+          currentUser: currentUser,
+          authToken: data.token,
+        })
+
+        showMainContent()
+        initializeTabs()
+        alert("Account created successfully!")
+      } else {
+        alert(data.error || "Registration failed")
       }
-    })
+    } catch (error) {
+      console.error("Registration error:", error)
+      alert("Registration failed. Please try again.")
+    }
   })
+
+  // Login functionality
+  document.getElementById("login-btn").addEventListener("click", async () => {
+    const email = document.getElementById("login-email").value.trim()
+    const password = document.getElementById("login-password").value
+
+    if (!email || !password) {
+      alert("Please enter both email and password")
+      return
+    }
+
+    try {
+      const response = await fetch(`${serverUrl}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        currentUser = data.user
+        isAuthenticated = true
+
+        await chrome.storage.local.set({
+          currentUser: currentUser,
+          authToken: data.token,
+        })
+
+        showMainContent()
+        initializeTabs()
+        alert("Signed in successfully!")
+      } else {
+        alert(data.error || "Login failed")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      alert("Login failed. Please try again.")
+    }
+  })
+
+  // Form switching functionality
+  document.getElementById("show-login").addEventListener("click", (e) => {
+    e.preventDefault()
+    document.getElementById("registration-form").style.display = "none"
+    document.getElementById("login-form").style.display = "block"
+  })
+
+  document.getElementById("show-register").addEventListener("click", (e) => {
+    e.preventDefault()
+    document.getElementById("login-form").style.display = "none"
+    document.getElementById("registration-form").style.display = "block"
+  })
+
+  function initializeTabs() {
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const targetTab = tab.dataset.tab
+
+        // Update active tab
+        tabs.forEach((t) => t.classList.remove("active"))
+        tab.classList.add("active")
+
+        // Update active content
+        tabContents.forEach((content) => content.classList.remove("active"))
+        document.getElementById(`${targetTab}-tab`).classList.add("active")
+
+        // Initialize wallet tab if selected
+        if (targetTab === "wallet") {
+          initializeWalletTab()
+          trackWalletUsage("opened")
+        }
+        if (targetTab === "profile") {
+          initializeProfileTab()
+        }
+        if (targetTab === "trending") {
+          initializeTrendingTab()
+        }
+      })
+    })
+  }
 
   // Get current tab info
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
@@ -150,6 +334,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         loadWallet(result.walletMnemonic)
         isConnected = result.walletConnected || false
         updateWalletDisplay()
+        updateWalletBalance()
+        startRealTimeMonitoring()
       } else {
         showWalletSetup()
       }
@@ -157,15 +343,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function initializeProfileTab() {
-    chrome.storage.local.get(["userProfile"], (result) => {
-      if (result.userProfile) {
-        currentProfile = result.userProfile
-        showProfileDisplay()
-        updateProfileDisplay()
-      } else {
-        showProfileSetup()
+    if (currentUser) {
+      currentProfile = {
+        username: currentUser.alias,
+        displayName: currentUser.display_name || currentUser.alias,
+        bio: currentUser.bio || "",
+        joinDate: currentUser.join_date,
+        websites: currentUser.website_url || "",
+        bitcoinAddress: currentUser.bitcoin_address || "",
       }
-    })
+      showProfileDisplay()
+      updateProfileDisplay()
+    }
   }
 
   function showWalletSetup() {
@@ -247,9 +436,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       connectWalletBtn.textContent = isConnected ? "Disconnect" : "Connect"
 
       if (isConnected) {
-        // In a real implementation, you would fetch the balance from a Bitcoin API
-        // For demo purposes, showing 0 balance
-        document.getElementById("wallet-balance").textContent = "0.00000000 BTC"
+        // Fetch real balance from Blockstream.info API
+        updateWalletBalance()
       }
     }
   }
@@ -329,7 +517,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   })
 
   // Confirm send transaction
-  confirmSendBtn.addEventListener("click", () => {
+  confirmSendBtn.addEventListener("click", async () => {
     const recipientAddress = document.getElementById("recipient-address").value
     const amount = Number.parseFloat(document.getElementById("send-amount").value)
 
@@ -338,21 +526,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       return
     }
 
-    // In a real implementation, you would:
-    // 1. Validate the recipient address
-    // 2. Check if you have sufficient balance
-    // 3. Create and sign the transaction
-    // 4. Broadcast to the Bitcoin network
+    if (!isConnected) {
+      alert("Please connect your wallet first.")
+      return
+    }
 
-    alert(
-      `Demo: Would send ${amount} BTC to ${recipientAddress}\n\nIn a real implementation, this would create and broadcast a Bitcoin transaction.`,
-    )
+    try {
+      // Validate Bitcoin address
+      bitcoin.address.toOutputScript(recipientAddress, bitcoin.networks.bitcoin)
 
-    trackWalletUsage("sent_bitcoin")
+      confirmSendBtn.textContent = "Sending..."
+      confirmSendBtn.disabled = true
 
-    sendForm.classList.remove("active")
-    document.getElementById("recipient-address").value = ""
-    document.getElementById("send-amount").value = ""
+      // Create and broadcast real transaction
+      const txid = await createAndBroadcastTransaction(recipientAddress, amount)
+
+      alert(
+        `Transaction sent successfully!\nTransaction ID: ${txid}\n\nView on explorer: https://blockstream.info/tx/${txid}`,
+      )
+
+      // Update balance after transaction
+      setTimeout(() => updateWalletBalance(), 2000)
+
+      trackWalletUsage("sent_bitcoin")
+    } catch (error) {
+      alert(`Transaction failed: ${error.message}`)
+    } finally {
+      confirmSendBtn.textContent = "Confirm Send"
+      confirmSendBtn.disabled = false
+      sendForm.classList.remove("active")
+      document.getElementById("recipient-address").value = ""
+      document.getElementById("send-amount").value = ""
+    }
   })
 
   // Show mnemonic
@@ -551,6 +756,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       currentDomain = new URL(tab.url).hostname
       document.getElementById("current-domain").textContent = currentDomain
       connectToServer()
+      detectCoinbaseCommerce() // Detect Coinbase Commerce on initialization
     }
   }
 
@@ -756,6 +962,521 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Real Bitcoin balance checking and transaction functionality
+  async function updateWalletBalance() {
+    if (!currentWallet || !currentWallet.address) return
+
+    try {
+      // Fetch balance from Blockstream.info API
+      const response = await fetch(`https://blockstream.info/api/address/${currentWallet.address}`)
+      const addressData = await response.json()
+
+      // Convert satoshis to BTC (handle both funded and spent amounts)
+      const funded = addressData.chain_stats?.funded_txo_sum || 0
+      const spent = addressData.chain_stats?.spent_txo_sum || 0
+      const balanceSatoshis = funded - spent
+      const balanceBTC = balanceSatoshis / 100000000
+
+      document.getElementById("wallet-balance").textContent = `${balanceBTC.toFixed(8)} BTC`
+
+      try {
+        const priceResponse = await fetch("https://api.coindesk.com/v1/bpi/currentprice.json")
+        const priceData = await priceResponse.json()
+        const btcPrice = Number.parseFloat(priceData.bpi.USD.rate.replace(",", ""))
+        const balanceUSD = (balanceBTC * btcPrice).toFixed(2)
+        document.getElementById("wallet-balance-usd").textContent = `≈ $${balanceUSD} USD`
+      } catch (priceError) {
+        console.error("Error fetching BTC price:", priceError)
+        document.getElementById("wallet-balance-usd").textContent = "Price unavailable"
+      }
+    } catch (error) {
+      console.error("Error fetching balance:", error)
+      document.getElementById("wallet-balance").textContent = "Error loading balance"
+      document.getElementById("wallet-balance-usd").textContent = ""
+    }
+  }
+
+  // Coinbase Commerce detection and payment processing
+  async function detectCoinbaseCommerce() {
+    try {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+      // Check if current page has Coinbase Commerce integration
+      chrome.tabs.sendMessage(tab.id, { type: "CHECK_COINBASE_COMMERCE" }, (response) => {
+        if (response && response.hasCommerce) {
+          showCommerceNotification(response.productInfo)
+        }
+      })
+    } catch (error) {
+      console.error("Error detecting Coinbase Commerce:", error)
+    }
+  }
+
+  function showCommerceNotification(productInfo) {
+    // Remove existing notification
+    const existing = document.querySelector(".commerce-notification")
+    if (existing) existing.remove()
+
+    const notification = document.createElement("div")
+    notification.className = "commerce-notification"
+    notification.innerHTML = `
+      <div class="commerce-alert">
+        <div class="commerce-header">
+          <span class="commerce-icon">🛒</span>
+          <span>Bitcoin Payment Available</span>
+        </div>
+        <div class="commerce-details">
+          <div class="product-info">
+            <span class="product-name">${productInfo.name || "Product"}</span>
+            <span class="product-price">${productInfo.price} ${productInfo.currency}</span>
+          </div>
+          <div class="btc-equivalent" id="btc-equivalent">
+            Calculating BTC amount...
+          </div>
+        </div>
+        <button class="btn-commerce" onclick="processCommercePayment('${productInfo.price}', '${productInfo.currency}', '${productInfo.name}')">
+          Pay ${productInfo.price} ${productInfo.currency} with Bitcoin
+        </button>
+      </div>
+    `
+
+    document.getElementById("wallet-tab").prepend(notification)
+
+    // Calculate BTC equivalent
+    calculateBTCEquivalent(productInfo.price, productInfo.currency)
+  }
+
+  async function calculateBTCEquivalent(price, currency) {
+    try {
+      let usdPrice = Number.parseFloat(price)
+
+      // Convert to USD if needed
+      if (currency !== "USD") {
+        const exchangeResponse = await fetch(`https://api.exchangerate-api.com/v4/latest/USD`)
+        const exchangeData = await exchangeResponse.json()
+        const rate = exchangeData.rates[currency]
+        if (rate) {
+          usdPrice = Number.parseFloat(price) / rate
+        }
+      }
+
+      // Get BTC price
+      const priceResponse = await fetch("https://api.coindesk.com/v1/bpi/currentprice.json")
+      const priceData = await priceResponse.json()
+      const btcPrice = Number.parseFloat(priceData.bpi.USD.rate.replace(",", ""))
+
+      const btcAmount = (usdPrice / btcPrice).toFixed(8)
+
+      const equivalentEl = document.getElementById("btc-equivalent")
+      if (equivalentEl) {
+        equivalentEl.textContent = `≈ ${btcAmount} BTC`
+      }
+
+      return btcAmount
+    } catch (error) {
+      console.error("Error calculating BTC equivalent:", error)
+      const equivalentEl = document.getElementById("btc-equivalent")
+      if (equivalentEl) {
+        equivalentEl.textContent = "BTC calculation unavailable"
+      }
+      return null
+    }
+  }
+
+  window.processCommercePayment = async (price, currency, productName) => {
+    const originalText = document.querySelector(".btn-commerce").textContent // Declare originalText here
+
+    if (!isConnected || !currentWallet) {
+      alert("Please connect your Bitcoin wallet first.")
+      return
+    }
+
+    try {
+      // Calculate BTC amount needed
+      const btcAmount = await calculateBTCEquivalent(price, currency)
+      if (!btcAmount) {
+        alert("Unable to calculate Bitcoin amount. Please try again.")
+        return
+      }
+
+      // Check if user has sufficient balance
+      const currentBalance = Number.parseFloat(
+        document.getElementById("wallet-balance").textContent.replace(" BTC", ""),
+      )
+      if (currentBalance < Number.parseFloat(btcAmount)) {
+        alert(`Insufficient balance. You need ${btcAmount} BTC but only have ${currentBalance} BTC.`)
+        return
+      }
+
+      // Show confirmation dialog
+      const confirmed = confirm(
+        `Confirm Bitcoin Payment:\n\n` +
+          `Product: ${productName}\n` +
+          `Price: ${price} ${currency}\n` +
+          `Bitcoin Amount: ${btcAmount} BTC\n\n` +
+          `Proceed with payment?`,
+      )
+
+      if (!confirmed) return
+
+      // Show processing state
+      const commerceBtn = document.querySelector(".btn-commerce")
+      commerceBtn.textContent = "Processing Payment..."
+      commerceBtn.disabled = true
+
+      const charge = await createCommerceCharge(price, currency, productName)
+
+      // Create and broadcast real Bitcoin transaction to Commerce address
+      const txid = await createAndBroadcastTransaction(charge.addresses.bitcoin, Number.parseFloat(btcAmount))
+
+      await notifyCommercePayment(charge.id, txid, btcAmount)
+
+      // Show success message
+      alert(
+        `Payment Successful! 🎉\n\n` +
+          `Transaction ID: ${txid}\n` +
+          `Amount: ${btcAmount} BTC\n` +
+          `Product: ${productName}\n\n` +
+          `View transaction: https://blockstream.info/tx/${txid}`,
+      )
+
+      // Update balance
+      setTimeout(() => updateWalletBalance(), 2000)
+
+      // Track analytics
+      trackWalletUsage("coinbase_commerce_payment")
+
+      // Remove notification
+      document.querySelector(".commerce-notification").remove()
+
+      // Notify merchant of payment
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+      chrome.tabs.sendMessage(tab.id, {
+        type: "PAYMENT_COMPLETED",
+        txid: txid,
+        amount: btcAmount,
+        currency: "BTC",
+        chargeId: charge.id,
+      })
+    } catch (error) {
+      console.error("Commerce payment error:", error)
+      alert(`Payment failed: ${error.message}`)
+    } finally {
+      // Reset button state
+      const commerceBtn = document.querySelector(".btn-commerce")
+      if (commerceBtn) {
+        commerceBtn.textContent = originalText
+        commerceBtn.disabled = false
+      }
+    }
+  }
+
+  async function createCommerceCharge(amount, currency, description) {
+    try {
+      const response = await fetch(`${COINBASE_COMMERCE_API_URL}/charges`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CC-Api-Key": COINBASE_COMMERCE_API_KEY,
+          "X-CC-Version": "2018-03-22",
+        },
+        body: JSON.stringify({
+          name: description,
+          description: `Payment for ${description}`,
+          pricing_type: "fixed_price",
+          local_price: {
+            amount: amount,
+            currency: currency,
+          },
+          metadata: {
+            merchant_id: COINBASE_MERCHANT_ID,
+            source: "relay_chat_extension",
+          },
+          redirect_url: window.location.href,
+          cancel_url: window.location.href,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Commerce API error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data.data
+    } catch (error) {
+      console.error("Error creating Commerce charge:", error)
+      throw new Error("Failed to create payment charge")
+    }
+  }
+
+  async function notifyCommercePayment(chargeId, txid, amount) {
+    try {
+      const paymentData = {
+        chargeId,
+        txid,
+        amount,
+        merchantId: COINBASE_MERCHANT_ID,
+        timestamp: new Date().toISOString(),
+      }
+
+      // Send to our webhook endpoint for processing
+      await fetch(`${SERVER_URL}/api/webhooks/coinbase`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "payment_initiated",
+          data: paymentData,
+        }),
+      })
+
+      console.log("Payment completed:", paymentData)
+
+      // Track the payment in analytics
+      trackWalletUsage("commerce_payment_completed", paymentData)
+    } catch (error) {
+      console.error("Error notifying Commerce payment:", error)
+    }
+  }
+
+  let balanceUpdateInterval = null
+  let priceUpdateInterval = null
+  let transactionMonitor = null
+  const pendingTransactions = new Set()
+
+  function startRealTimeMonitoring() {
+    // Update balance every 30 seconds
+    if (balanceUpdateInterval) clearInterval(balanceUpdateInterval)
+    balanceUpdateInterval = setInterval(() => {
+      if (currentWallet && currentWallet.address) {
+        updateWalletBalance()
+      }
+    }, 30000)
+
+    // Update BTC price every 60 seconds
+    if (priceUpdateInterval) clearInterval(priceUpdateInterval)
+    priceUpdateInterval = setInterval(updateBTCPrice, 60000)
+
+    // Monitor pending transactions every 15 seconds
+    if (transactionMonitor) clearInterval(transactionMonitor)
+    transactionMonitor = setInterval(monitorPendingTransactions, 15000)
+  }
+
+  function stopRealTimeMonitoring() {
+    if (balanceUpdateInterval) {
+      clearInterval(balanceUpdateInterval)
+      balanceUpdateInterval = null
+    }
+    if (priceUpdateInterval) {
+      clearInterval(priceUpdateInterval)
+      priceUpdateInterval = null
+    }
+    if (transactionMonitor) {
+      clearInterval(transactionMonitor)
+      transactionMonitor = null
+    }
+  }
+
+  async function updateBTCPrice() {
+    try {
+      const priceResponse = await fetch("https://api.coindesk.com/v1/bpi/currentprice.json")
+      const priceData = await priceResponse.json()
+      const btcPrice = Number.parseFloat(priceData.bpi.USD.rate.replace(",", ""))
+
+      // Update price display if balance exists
+      const balanceElement = document.getElementById("wallet-balance")
+      if (balanceElement && balanceElement.textContent !== "Error loading balance") {
+        const balanceBTC = Number.parseFloat(balanceElement.textContent.replace(" BTC", ""))
+        const balanceUSD = (balanceBTC * btcPrice).toFixed(2)
+        document.getElementById("wallet-balance-usd").textContent = `≈ $${balanceUSD} USD`
+      }
+    } catch (error) {
+      console.error("Error updating BTC price:", error)
+    }
+  }
+
+  async function monitorPendingTransactions() {
+    if (pendingTransactions.size === 0) return
+
+    for (const txid of pendingTransactions) {
+      try {
+        const response = await fetch(`https://blockstream.info/api/tx/${txid}`)
+        const txData = await response.json()
+
+        if (txData.status && txData.status.confirmed) {
+          // Transaction confirmed
+          pendingTransactions.delete(txid)
+          showTransactionNotification(txid, "confirmed", txData.status.block_height)
+          // Update balance after confirmation
+          updateWalletBalance()
+        }
+      } catch (error) {
+        console.error(`Error monitoring transaction ${txid}:`, error)
+      }
+    }
+  }
+
+  function showTransactionNotification(txid, status, blockHeight = null) {
+    const notification = document.createElement("div")
+    notification.className = "transaction-notification"
+    notification.innerHTML = `
+      <div class="notification-content">
+        <strong>Transaction ${status.charAt(0).toUpperCase() + status.slice(1)}</strong>
+        <p>TX: ${txid.substring(0, 16)}...</p>
+        ${blockHeight ? `<p>Block: ${blockHeight}</p>` : ""}
+      </div>
+    `
+
+    document.body.appendChild(notification)
+    setTimeout(() => notification.remove(), 5000)
+  }
+
+  async function estimateNetworkFee() {
+    try {
+      const response = await fetch("https://blockstream.info/api/fee-estimates")
+      const feeData = await response.json()
+
+      // Get fee for next block (fastest), 6 blocks (medium), 144 blocks (slow)
+      return {
+        fast: Math.ceil(feeData[1] || 20), // sat/vB
+        medium: Math.ceil(feeData[6] || 15),
+        slow: Math.ceil(feeData[144] || 10),
+      }
+    } catch (error) {
+      console.error("Error fetching fee estimates:", error)
+      return { fast: 20, medium: 15, slow: 10 }
+    }
+  }
+
+  function initializeTrendingTab() {
+    loadTrendingData()
+
+    // Clear existing interval if any
+    if (trendingUpdateInterval) {
+      clearInterval(trendingUpdateInterval)
+    }
+
+    // Set up auto-refresh every 10 minutes
+    trendingUpdateInterval = setInterval(loadTrendingData, TRENDING_UPDATE_INTERVAL)
+  }
+
+  async function loadTrendingData() {
+    try {
+      const response = await fetch("https://v0-clone-relay-extension.vercel.app/api/analytics/trending")
+      const data = await response.json()
+
+      if (data.error) {
+        console.error("Trending data error:", data.error)
+        showTrendingError()
+        return
+      }
+
+      updateTrendingDisplay(data)
+      updateLastUpdatedTime()
+    } catch (error) {
+      console.error("Failed to load trending data:", error)
+      showTrendingError()
+    }
+  }
+
+  function updateTrendingDisplay(data) {
+    // Update active users count
+    const activeUsersEl = document.getElementById("total-active-users")
+    if (activeUsersEl) {
+      activeUsersEl.textContent = data.activeUsers || 0
+    }
+
+    // Update top domains
+    const trendingDomainsEl = document.getElementById("trending-domains")
+    if (trendingDomainsEl && data.topDomains) {
+      if (data.topDomains.length === 0) {
+        trendingDomainsEl.innerHTML = '<div class="no-data">No active domains yet</div>'
+      } else {
+        trendingDomainsEl.innerHTML = data.topDomains
+          .map(
+            (domain, index) => `
+          <div class="trending-item">
+            <div class="trending-domain">${index + 1}. ${domain.domain}</div>
+            <div class="trending-stats">
+              <span class="trending-users">${domain.activeUsers} users</span>
+              <span class="trending-messages">${domain.messages} visits</span>
+            </div>
+          </div>
+        `,
+          )
+          .join("")
+      }
+    }
+
+    // Update daily stats
+    if (data.dailyStats) {
+      const dailyMessagesEl = document.getElementById("daily-messages")
+      const dailyTipsEl = document.getElementById("daily-tips")
+      const dailyDomainsEl = document.getElementById("daily-domains")
+
+      if (dailyMessagesEl) dailyMessagesEl.textContent = data.dailyStats.messages || 0
+      if (dailyTipsEl) dailyTipsEl.textContent = data.dailyStats.tips || 0
+      if (dailyDomainsEl) dailyDomainsEl.textContent = data.dailyStats.domains || 0
+    }
+
+    // Update activity feed
+    const activityFeedEl = document.getElementById("activity-feed")
+    if (activityFeedEl && data.recentActivity) {
+      if (data.recentActivity.length === 0) {
+        activityFeedEl.innerHTML = '<div class="no-data">No recent activity</div>'
+      } else {
+        activityFeedEl.innerHTML = data.recentActivity
+          .map(
+            (activity) => `
+          <div class="activity-item">
+            <div class="activity-text">
+              ${activity.action} <span class="activity-domain">${activity.domain}</span>
+            </div>
+            <div class="activity-time">${formatTimeAgo(activity.timestamp)}</div>
+          </div>
+        `,
+          )
+          .join("")
+      }
+    }
+  }
+
+  function updateLastUpdatedTime() {
+    const lastUpdatedEl = document.getElementById("last-updated")
+    if (lastUpdatedEl) {
+      const now = new Date()
+      lastUpdatedEl.textContent = `Updated ${now.toLocaleTimeString()}`
+    }
+  }
+
+  function showTrendingError() {
+    const trendingDomainsEl = document.getElementById("trending-domains")
+    const activityFeedEl = document.getElementById("activity-feed")
+
+    if (trendingDomainsEl) {
+      trendingDomainsEl.innerHTML = '<div class="no-data">Unable to load trending data</div>'
+    }
+    if (activityFeedEl) {
+      activityFeedEl.innerHTML = '<div class="no-data">Unable to load activity feed</div>'
+    }
+  }
+
+  function formatTimeAgo(timestamp) {
+    const now = new Date()
+    const time = new Date(timestamp)
+    const diffInMinutes = Math.floor((now - time) / (1000 * 60))
+
+    if (diffInMinutes < 1) return "now"
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) return `${diffInHours}h ago`
+
+    const diffInDays = Math.floor(diffInHours / 24)
+    return `${diffInDays}d ago`
+  }
+
   // Event listeners
   sendMessageBtn.addEventListener("click", sendMessage)
   messageInput.addEventListener("keypress", (e) => {
@@ -765,5 +1486,67 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   })
 
+  // Add resize functionality
+  const resizeHandle = document.getElementById("resize-handle")
+  if (resizeHandle) {
+    let isResizing = false
+    let startY = 0
+    let startHeight = 0
+
+    resizeHandle.addEventListener("mousedown", (e) => {
+      isResizing = true
+      startY = e.clientY
+      startHeight = document.body.offsetHeight
+      document.body.style.userSelect = "none"
+      e.preventDefault()
+    })
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isResizing) return
+
+      const deltaY = e.clientY - startY
+      const newHeight = startHeight + deltaY
+      const minHeight = 400
+      const maxHeight = 800
+
+      const clampedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight))
+      document.body.style.height = clampedHeight + "px"
+
+      // Update tab content height
+      const tabContents = document.querySelectorAll(".tab-content")
+      tabContents.forEach((content) => {
+        content.style.height = `calc(${clampedHeight}px - 200px)`
+      })
+    })
+
+    document.addEventListener("mouseup", () => {
+      if (isResizing) {
+        isResizing = false
+        document.body.style.userSelect = ""
+
+        // Save height preference
+        localStorage.setItem("relay_popup_height", document.body.offsetHeight)
+      }
+    })
+
+    // Restore saved height
+    const savedHeight = localStorage.getItem("relay_popup_height")
+    if (savedHeight) {
+      const height = Number.parseInt(savedHeight)
+      document.body.style.height = height + "px"
+      const tabContents = document.querySelectorAll(".tab-content")
+      tabContents.forEach((content) => {
+        content.style.height = `calc(${height}px - 200px)`
+      })
+    }
+  }
+
   initializeChat()
+
+  // Declare createAndBroadcastTransaction function
+  async function createAndBroadcastTransaction(recipientAddress, amount) {
+    // Placeholder for transaction creation and broadcasting logic
+    // This should be replaced with actual Bitcoin transaction handling code
+    return "mock_txid"
+  }
 })

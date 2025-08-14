@@ -8,7 +8,8 @@ body {
   width: 400px;
   height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: linear-gradient(135deg, #1e293b 0%, #7c3aed 50%, #1e293b 100%);
+  /* Changed from purple gradient to green gradient with black background */
+  background: linear-gradient(135deg, #000000 0%, #10b981 50%, #000000 100%);
   color: white;
   overflow: hidden;
 }
@@ -18,15 +19,18 @@ body {
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(20px);
-  background: rgba(30, 41, 59, 0.95);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.95);
 }
 
 .header {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  /* Changed from purple gradient to green gradient */
+  background: linear-gradient(135deg, #10b981, #059669);
   padding: 20px;
   text-align: center;
   position: relative;
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+  /* Changed shadow color to green */
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
 }
 
 .logo {
@@ -55,7 +59,8 @@ body {
 
 .tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -74,9 +79,10 @@ body {
 }
 
 .tab.active {
-  color: #a855f7;
-  background: rgba(168, 85, 247, 0.1);
-  border-bottom-color: #a855f7;
+  /* Changed active tab color to green */
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border-bottom-color: #10b981;
 }
 
 .tab:hover:not(.active) {
@@ -89,6 +95,8 @@ body {
   padding: 20px;
   display: none;
   overflow-y: auto;
+  /* Added black background */
+  background: #000000;
 }
 
 .tab-content.active {
@@ -98,7 +106,8 @@ body {
 
 /* Chat Styles */
 .chat-header {
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -110,14 +119,16 @@ body {
 }
 
 .domain-name {
-  color: #a855f7;
+  /* Changed to green */
+  color: #10b981;
   font-weight: 600;
   font-size: 14px;
 }
 
 .user-count {
-  background: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
+  /* Changed to green background */
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
   padding: 4px 8px;
   border-radius: 8px;
   font-size: 12px;
@@ -134,7 +145,8 @@ body {
 }
 
 .message {
-  background: rgba(255, 255, 255, 0.08);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 16px;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -142,7 +154,8 @@ body {
 }
 
 .message.own {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  /* Changed to green gradient */
+  background: linear-gradient(135deg, #10b981, #059669);
   margin-left: 40px;
 }
 
@@ -154,7 +167,8 @@ body {
 }
 
 .message-user {
-  color: #a855f7;
+  /* Changed to green */
+  color: #10b981;
   font-weight: 600;
   font-size: 12px;
 }
@@ -198,7 +212,8 @@ body {
 .message-input {
   display: flex;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 12px;
   padding: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -221,11 +236,13 @@ body {
 
 .message-input input:focus {
   outline: none;
-  border-color: #a855f7;
+  /* Changed focus color to green */
+  border-color: #10b981;
 }
 
 .message-input button {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  /* Changed to green gradient */
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -276,7 +293,8 @@ body {
 }
 
 .balance {
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
@@ -317,7 +335,8 @@ body {
 
 .address-display span {
   flex: 1;
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 8px 12px;
@@ -361,7 +380,8 @@ body {
 
 .send-section input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 8px 12px;
@@ -376,7 +396,180 @@ body {
 
 .send-section input:focus {
   outline: none;
-  border-color: #a855f7;
+  /* Changed focus color to green */
+  border-color: #10b981;
+}
+
+/* Added real-time monitoring notification styles */
+.transaction-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-radius: 12px;
+  padding: 12px 16px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  backdrop-filter: blur(10px);
+  z-index: 1001;
+  animation: slideIn 0.3s ease;
+}
+
+.notification-content {
+  color: white;
+  font-size: 12px;
+}
+
+.notification-content strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.notification-content p {
+  margin: 2px 0;
+  opacity: 0.9;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Added Coinbase Commerce notification styles */
+.commerce-notification {
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.commerce-alert {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.commerce-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+.commerce-icon {
+  font-size: 16px;
+}
+
+.commerce-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-name {
+  font-weight: 600;
+  color: white;
+}
+
+.product-price {
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+.btc-equivalent {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.btn-commerce {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  width: 100%;
+}
+
+.btn-commerce:hover {
+  transform: scale(1.02);
+}
+
+.btn-commerce:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Added real-time balance update indicator */
+.balance-updating {
+  position: relative;
+}
+
+.balance-updating::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  /* Changed spinner color to green */
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-top: 2px solid #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Added fee estimation display */
+.fee-estimate {
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fee-estimate .fee-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.fee-estimate .fee-amount {
+  color: #fbbf24;
+  font-weight: 600;
 }
 
 /* Profile Styles */
@@ -393,7 +586,8 @@ body {
 .profile-form input,
 .profile-form textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   padding: 8px 12px;
@@ -411,7 +605,8 @@ body {
 .profile-form input:focus,
 .profile-form textarea:focus {
   outline: none;
-  border-color: #a855f7;
+  /* Changed focus color to green */
+  border-color: #10b981;
 }
 
 .profile-form textarea {
@@ -426,7 +621,8 @@ body {
 
 /* Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  /* Changed to green gradient */
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
   border: none;
   padding: 10px 16px;
@@ -460,9 +656,10 @@ body {
 }
 
 .btn-copy {
-  background: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  /* Changed to green background */
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 12px;
@@ -473,7 +670,8 @@ body {
 }
 
 .btn-copy:hover {
-  background: rgba(168, 85, 247, 0.3);
+  /* Changed hover to green */
+  background: rgba(16, 185, 129, 0.3);
 }
 
 /* Modal Styles */
@@ -491,7 +689,8 @@ body {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #1e293b, #7c3aed);
+  /* Changed to green gradient with black */
+  background: linear-gradient(135deg, #000000, #10b981);
   border-radius: 16px;
   padding: 24px;
   width: 90%;
@@ -534,8 +733,9 @@ body {
 
 .tip-amount:hover,
 .tip-amount.selected {
-  background: rgba(168, 85, 247, 0.3);
-  border-color: #a855f7;
+  /* Changed to green background */
+  background: rgba(16, 185, 129, 0.3);
+  border-color: #10b981;
 }
 
 .modal-actions {
@@ -554,15 +754,215 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.5);
+  /* Changed to green */
+  background: rgba(16, 185, 129, 0.5);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.7);
+  /* Changed to green */
+  background: rgba(16, 185, 129, 0.7);
+}
+
+/* Trending Tab Styles */
+.trending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.active-users {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.active-count {
+  font-weight: 700;
+  /* Changed to green */
+  color: #10b981;
+  font-size: 24px;
+}
+
+.active-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.last-updated {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.trending-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 16px;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trending-list {
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.trending-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trending-item:last-child {
+  border-bottom: none;
+}
+
+.trending-domain {
+  /* Changed to green */
+  color: #10b981;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.trending-stats {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.trending-users {
+  /* Changed to green background */
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.trending-messages {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.daily-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.stat-card {
+  text-align: center;
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 16px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.stat-number {
+  font-size: 20px;
+  /* Changed to green */
+  color: #10b981;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.activity-feed {
+  /* Changed to black background */
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.activity-domain {
+  /* Changed to green */
+  color: #10b981;
+  font-weight: 600;
+}
+
+.activity-time {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+.no-data {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  padding: 20px;
+}
+
+.loading {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  padding: 20px;
+}
+
+.loading::after {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  /* Changed loading spinner to green */
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  border-top: 2px solid #10b981;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-left: 8px;
 }

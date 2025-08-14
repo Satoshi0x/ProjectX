@@ -3,7 +3,7 @@ const chrome = window.chrome
 class RelayBackgroundService {
   constructor() {
     this.serverUrl =
-      process.env.NODE_ENV === "production" ? "https://your-relay-server.vercel.app" : "http://localhost:3001"
+      process.env.NODE_ENV === "production" ? "https://v0-clone-relay-extension.vercel.app" : "http://localhost:3001"
     this.init()
   }
 
