@@ -1,9 +1,11 @@
-const chrome = window.chrome
+const chrome = window.chrome // Declare the chrome variable
 
 class RelayBackgroundService {
   constructor() {
     this.serverUrl =
-      process.env.NODE_ENV === "production" ? "https://v0-clone-relay-extension.vercel.app" : "http://localhost:3001"
+      typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:3001"
+        : "https://v0-clone-relay-extension.vercel.app"
     this.init()
   }
 
