@@ -1,10 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
-
 export async function GET(request: NextRequest) {
   try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !supabaseKey) {
+      return NextResponse.json({
+        error: "Missing Supabase configuration",
+        activeUsers: 0,
+        topDomains: [],
+        dailyStats: { messages: 0, tips: 0, domains: 0 },
+        recentActivity: [],
+      })
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
     const now = new Date()
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
     const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000)
@@ -104,7 +117,16 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error("Analytics trending error:", error)
-    return NextResponse.json({ error: "Failed to fetch trending data" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to fetch trending data",
+        activeUsers: 0,
+        topDomains: [],
+        dailyStats: { messages: 0, tips: 0, domains: 0 },
+        recentActivity: [],
+      },
+      { status: 500 },
+    )
   }
 }
 

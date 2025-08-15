@@ -916,10 +916,11 @@
 
   <div class="resize-handle" id="resize-handle"></div>
 
-  <!-- Added external Bitcoin and Socket.IO libraries directly in HTML -->
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="https://unpkg.com/bitcoinjs-lib@6.1.5/dist/bitcoinjs-lib.min.js"></script>
-  <script src="https://unpkg.com/bip39@3.1.0/dist/index.js"></script>
+  <!-- Replaced external CDN scripts with local bundled libraries -->
+  <script src="lib/socket.io.min.js"></script>
+  <script src="lib/bitcoinjs-lib.min.js"></script>
+  <script src="lib/bip39.min.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>
+</merged_code>

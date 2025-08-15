@@ -22,5 +22,11 @@
   "action": {
     "default_popup": "popup.html",
     "default_title": "Relay Chat"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/*.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

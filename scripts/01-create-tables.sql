@@ -26,13 +26,14 @@ CREATE TABLE IF NOT EXISTS messages (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create user_analytics table for tracking user behavior
-CREATE TABLE IF NOT EXISTS user_analytics (
+-- Rename user_analytics to analytics to match API expectations
+CREATE TABLE IF NOT EXISTS analytics (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  anonymous_id TEXT NOT NULL,
-  domain TEXT NOT NULL,
-  action_type TEXT NOT NULL CHECK (action_type IN ('site_visit', 'wallet_action', 'commerce_transaction')),
+  user_id TEXT,
+  website TEXT,
+  action TEXT NOT NULL,
   action_data JSONB,
+  timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -50,15 +51,17 @@ CREATE TABLE IF NOT EXISTS posts (
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_messages_domain ON messages(domain);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_user_analytics_anonymous_id ON user_analytics(anonymous_id);
-CREATE INDEX IF NOT EXISTS idx_user_analytics_domain ON user_analytics(domain);
+CREATE INDEX IF NOT EXISTS idx_analytics_user_id ON analytics(user_id);
+CREATE INDEX IF NOT EXISTS idx_analytics_website ON analytics(website);
+CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON analytics(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_analytics_action ON analytics(action);
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
 
 -- Enable Row Level Security
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-ALTER TABLE user_analytics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE analytics ENABLE ROW LEVEL SECURITY;
 ALTER TABLE posts ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for users table
@@ -70,9 +73,9 @@ CREATE POLICY "Users can insert own profile" ON users FOR INSERT WITH CHECK (aut
 CREATE POLICY "Anyone can view messages" ON messages FOR SELECT USING (true);
 CREATE POLICY "Authenticated users can insert messages" ON messages FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Create policies for user_analytics table (anonymous tracking)
-CREATE POLICY "Anyone can insert analytics" ON user_analytics FOR INSERT WITH CHECK (true);
-CREATE POLICY "Anyone can view analytics" ON user_analytics FOR SELECT USING (true);
+-- Create policies for analytics table (anonymous tracking)
+CREATE POLICY "Anyone can insert analytics" ON analytics FOR INSERT WITH CHECK (true);
+CREATE POLICY "Anyone can view analytics" ON analytics FOR SELECT USING (true);
 
 -- Create policies for posts table
 CREATE POLICY "Anyone can view published posts" ON posts FOR SELECT USING (published = true);

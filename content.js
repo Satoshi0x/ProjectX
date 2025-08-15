@@ -36,7 +36,7 @@ class RelayContentScript {
   }
 
   trackSiteVisit() {
-    const chrome = window.chrome // Declare chrome variable
+    const chrome = window.chrome // Declare the chrome variable
     if (chrome && chrome.runtime) {
       chrome.runtime.sendMessage({
         type: "TRACK_SITE_VISIT",
@@ -50,7 +50,7 @@ class RelayContentScript {
   connectToServer() {
     // Load Socket.IO client
     const script = document.createElement("script")
-    script.src = "https://cdn.socket.io/4.7.2/socket.io.min.js"
+    script.src = window.chrome.runtime.getURL("lib/socket.io.min.js") // Updated line
     script.onload = () => {
       const io = window.io
       this.socket = io(this.serverUrl)
@@ -399,7 +399,7 @@ class RelayContentScript {
   }
 
   handleMessage(request, sender, sendResponse) {
-    const chrome = window.chrome // Declare chrome variable
+    const chrome = window.chrome // Declare the chrome variable
     if (request.type === "TRACK_WALLET_USAGE") {
       if (this.socket) {
         this.socket.emit("track-wallet-usage", {
@@ -492,9 +492,9 @@ if (document.readyState === "loading") {
   relayContentScript = new RelayContentScript()
 }
 
-const chrome = window.chrome // Declare chrome variable
-if (chrome && chrome.runtime) {
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+if (window.chrome && window.chrome.runtime) {
+  // Use window.chrome instead of chrome
+  window.chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (relayContentScript) {
       relayContentScript.handleMessage(request, sender, sendResponse)
     }
