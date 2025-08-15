@@ -3,8 +3,7 @@ class RelayContentScript {
   constructor() {
     this.domain = window.location.hostname
     this.anonymousUserId = this.generateAnonymousId()
-    this.serverUrl =
-      process.env.NODE_ENV === "production" ? "https://v0-clone-relay-extension.vercel.app" : "http://localhost:3001"
+    this.serverUrl = "https://v0-clone-relay-extension.vercel.app"
     this.popupVisible = false
     this.dragButton = null
     this.popupContainer = null
@@ -37,12 +36,15 @@ class RelayContentScript {
   }
 
   trackSiteVisit() {
-    window.chrome.runtime.sendMessage({
-      type: "TRACK_SITE_VISIT",
-      domain: this.domain,
-      anonymousUserId: this.anonymousUserId,
-      timestamp: Date.now(),
-    })
+    const chrome = window.chrome // Declare chrome variable
+    if (chrome && chrome.runtime) {
+      chrome.runtime.sendMessage({
+        type: "TRACK_SITE_VISIT",
+        domain: this.domain,
+        anonymousUserId: this.anonymousUserId,
+        timestamp: Date.now(),
+      })
+    }
   }
 
   connectToServer() {
@@ -114,14 +116,14 @@ class RelayContentScript {
         position: fixed;
         width: 60px;
         height: 60px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         cursor: move;
         z-index: 10000;
-        box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 8px 32px rgba(16, 185, 129, 0.4);
         backdrop-filter: blur(10px);
         border: 2px solid rgba(255, 255, 255, 0.1);
         transition: all 0.3s ease;
@@ -130,7 +132,7 @@ class RelayContentScript {
       
       .relay-drag-button:hover {
         transform: scale(1.1);
-        box-shadow: 0 12px 40px rgba(102, 126, 234, 0.6);
+        box-shadow: 0 12px 40px rgba(16, 185, 129, 0.6);
       }
       
       .relay-drag-button svg {
@@ -289,7 +291,7 @@ class RelayContentScript {
         <h2 style="margin: 0 0 20px 0; text-align: center;">Relay Chat</h2>
         <p style="text-align: center; margin-bottom: 20px;">Domain: ${this.domain}</p>
         <div style="text-align: center;">
-          <button onclick="chrome.runtime.sendMessage({type: 'OPEN_FULL_POPUP'})" 
+          <button onclick="window.chrome.runtime.sendMessage({type: 'OPEN_FULL_POPUP'})" 
                   style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
                          color: white; border: none; padding: 12px 24px; 
                          border-radius: 8px; cursor: pointer; font-weight: 600;">
@@ -397,6 +399,7 @@ class RelayContentScript {
   }
 
   handleMessage(request, sender, sendResponse) {
+    const chrome = window.chrome // Declare chrome variable
     if (request.type === "TRACK_WALLET_USAGE") {
       if (this.socket) {
         this.socket.emit("track-wallet-usage", {
@@ -489,9 +492,12 @@ if (document.readyState === "loading") {
   relayContentScript = new RelayContentScript()
 }
 
-window.chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (relayContentScript) {
-    relayContentScript.handleMessage(request, sender, sendResponse)
-  }
-  return true // Keep message channel open for async responses
-})
+const chrome = window.chrome // Declare chrome variable
+if (chrome && chrome.runtime) {
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (relayContentScript) {
+      relayContentScript.handleMessage(request, sender, sendResponse)
+    }
+    return true // Keep message channel open for async responses
+  })
+}
