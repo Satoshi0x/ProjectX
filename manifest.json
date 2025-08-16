@@ -25,7 +25,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["lib/*.js"],
+      "resources": ["lib/*.js", "popup.html", "popup.css", "popup.js"],
       "matches": ["<all_urls>"]
     }
   ]

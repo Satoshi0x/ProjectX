@@ -1,4 +1,6 @@
 // Content script for Relay Chat Extension
+/* global chrome */
+
 class RelayContentScript {
   constructor() {
     this.domain = window.location.hostname
@@ -36,9 +38,8 @@ class RelayContentScript {
   }
 
   trackSiteVisit() {
-    const chrome = window.chrome // Declare the chrome variable
-    if (chrome && chrome.runtime) {
-      chrome.runtime.sendMessage({
+    if (window.chrome && window.chrome.runtime) {
+      window.chrome.runtime.sendMessage({
         type: "TRACK_SITE_VISIT",
         domain: this.domain,
         anonymousUserId: this.anonymousUserId,
@@ -399,7 +400,6 @@ class RelayContentScript {
   }
 
   handleMessage(request, sender, sendResponse) {
-    const chrome = window.chrome // Declare the chrome variable
     if (request.type === "TRACK_WALLET_USAGE") {
       if (this.socket) {
         this.socket.emit("track-wallet-usage", {
@@ -493,7 +493,6 @@ if (document.readyState === "loading") {
 }
 
 if (window.chrome && window.chrome.runtime) {
-  // Use window.chrome instead of chrome
   window.chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (relayContentScript) {
       relayContentScript.handleMessage(request, sender, sendResponse)

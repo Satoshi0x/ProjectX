@@ -52,35 +52,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   let trendingUpdateInterval = null
   const TRENDING_UPDATE_INTERVAL = 10 * 60 * 1000 // 10 minutes
 
-  // Load libraries dynamically
-  await loadBitcoinLibraries()
+  // Bitcoin libraries are now loaded locally via HTML script tags
+  // Initialize Bitcoin libraries from locally loaded scripts
+  function initializeBitcoinLibraries() {
+    // Libraries are already loaded via HTML script tags
+    bip39 = window.bip39
+    bitcoin = window.bitcoin
 
-  async function loadBitcoinLibraries() {
-    return new Promise((resolve) => {
-      // Load bip39 library
-      const bip39Script = document.createElement("script")
-      bip39Script.src = "https://cdn.jsdelivr.net/npm/bip39@3.1.0/src/index.js"
+    if (!bip39 || !bitcoin) {
+      console.error("Bitcoin libraries not loaded properly")
+      return false
+    }
 
-      // Load bitcoinjs-lib
-      const bitcoinScript = document.createElement("script")
-      bitcoinScript.src = "https://cdn.jsdelivr.net/npm/bitcoinjs-lib@6.1.5/dist/bitcoinjs-lib.min.js"
-
-      let scriptsLoaded = 0
-      const onScriptLoad = () => {
-        scriptsLoaded++
-        if (scriptsLoaded === 2) {
-          bip39 = window.bip39
-          bitcoin = window.bitcoin
-          resolve()
-        }
-      }
-
-      bip39Script.onload = onScriptLoad
-      bitcoinScript.onload = onScriptLoad
-
-      document.head.appendChild(bip39Script)
-      document.head.appendChild(bitcoinScript)
-    })
+    return true
   }
 
   let currentProfile = null
@@ -761,16 +745,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function connectToServer() {
-    // Load Socket.IO client
-    const script = document.createElement("script")
-    script.src = "https://cdn.socket.io/4.7.2/socket.io.min.js"
-    script.onload = () => {
-      const io = window.io // Declare the io variable here
+    // Socket.IO is already loaded via HTML script tag
+    if (window.io) {
+      const io = window.io
       socket = io(serverUrl)
       setupSocketListeners()
       joinRoom()
+    } else {
+      console.error("Socket.IO not loaded properly from local library")
     }
-    document.head.appendChild(script)
   }
 
   function setupSocketListeners() {
@@ -1545,8 +1528,82 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Declare createAndBroadcastTransaction function
   async function createAndBroadcastTransaction(recipientAddress, amount) {
-    // Placeholder for transaction creation and broadcasting logic
-    // This should be replaced with actual Bitcoin transaction handling code
-    return "mock_txid"
+    if (!currentWallet || !bitcoin) {
+      throw new Error("Wallet not loaded or Bitcoin library unavailable")
+    }
+
+    try {
+      // Get UTXOs for the address
+      const response = await fetch(`https://blockstream.info/api/address/${currentWallet.address}/utxo`)
+      const utxos = await response.json()
+
+      if (utxos.length === 0) {
+        throw new Error("No UTXOs available for transaction")
+      }
+
+      // Create transaction
+      const psbt = new bitcoin.Psbt({ network: bitcoin.networks.bitcoin })
+
+      let totalInput = 0
+      for (const utxo of utxos) {
+        // Get transaction hex for each UTXO
+        const txResponse = await fetch(`https://blockstream.info/api/tx/${utxo.txid}/hex`)
+        const txHex = await txResponse.text()
+
+        psbt.addInput({
+          hash: utxo.txid,
+          index: utxo.vout,
+          nonWitnessUtxo: Buffer.from(txHex, "hex"),
+        })
+
+        totalInput += utxo.value
+      }
+
+      const amountSatoshis = Math.floor(amount * 100000000)
+      const fee = 1000 // 1000 satoshis fee
+      const change = totalInput - amountSatoshis - fee
+
+      // Add output for recipient
+      psbt.addOutput({
+        address: recipientAddress,
+        value: amountSatoshis,
+      })
+
+      // Add change output if needed
+      if (change > 546) {
+        // Dust limit
+        psbt.addOutput({
+          address: currentWallet.address,
+          value: change,
+        })
+      }
+
+      // Sign all inputs
+      for (let i = 0; i < utxos.length; i++) {
+        psbt.signInput(i, currentWallet.privateKey)
+      }
+
+      psbt.finalizeAllInputs()
+      const txHex = psbt.extractTransaction().toHex()
+
+      // Broadcast transaction
+      const broadcastResponse = await fetch("https://blockstream.info/api/tx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+        },
+        body: txHex,
+      })
+
+      if (!broadcastResponse.ok) {
+        throw new Error("Failed to broadcast transaction")
+      }
+
+      const txid = await broadcastResponse.text()
+      return txid
+    } catch (error) {
+      console.error("Transaction creation failed:", error)
+      throw error
+    }
   }
 })
