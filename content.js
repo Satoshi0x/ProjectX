@@ -51,17 +51,38 @@ class RelayContentScript {
   connectToServer() {
     // Load Socket.IO client
     const script = document.createElement("script")
-    script.src = window.chrome.runtime.getURL("lib/socket.io.min.js") // Updated line
+    script.src = window.chrome.runtime.getURL("lib/socket.io.min.js") // Fixed chrome reference
     script.onload = () => {
-      const io = window.io
-      this.socket = io(this.serverUrl)
-      this.setupSocketListeners()
-      this.joinRoom()
+      if (typeof window.io === "function") {
+        try {
+          this.socket = window.io(this.serverUrl)
+          this.setupSocketListeners()
+          this.joinRoom()
+        } catch (error) {
+          console.error("[Relay] Failed to initialize Socket.IO:", error)
+          this.handleSocketError()
+        }
+      } else {
+        console.error("[Relay] Socket.IO library not loaded properly")
+        this.handleSocketError()
+      }
+    }
+    script.onerror = () => {
+      console.error("[Relay] Failed to load Socket.IO library")
+      this.handleSocketError()
     }
     document.head.appendChild(script)
   }
 
+  handleSocketError() {
+    console.warn("[Relay] Running in offline mode - Socket.IO features disabled")
+    // Extension will still work for local features like draggable button
+    // but real-time chat features will be disabled
+  }
+
   setupSocketListeners() {
+    if (!this.socket) return
+
     this.socket.on("connect", () => {
       console.log("Connected to Relay server")
       this.trackSiteVisit()
@@ -70,10 +91,14 @@ class RelayContentScript {
     this.socket.on("user-count-update", (count) => {
       this.updateUserCount(count)
     })
+
+    this.socket.on("connect_error", (error) => {
+      console.error("[Relay] Socket connection error:", error)
+    })
   }
 
   joinRoom() {
-    if (this.socket) {
+    if (this.socket && this.socket.connected) {
       this.socket.emit("join-room", this.domain)
     }
   }
