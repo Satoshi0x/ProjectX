@@ -1,4 +1,7 @@
 // Popup script for Relay Chat Extension
+/* global chrome */
+/* eslint-env webextensions */
+
 document.addEventListener("DOMContentLoaded", async () => {
   const currentDomainEl = document.getElementById("current-domain")
   const userCountEl = document.getElementById("user-count")
@@ -43,9 +46,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let socket = null
   let currentDomain = null
   const username = generateUsername()
-
-  // Declare chrome variable
-  const chrome = window.chrome
 
   let bip39, bitcoin
 

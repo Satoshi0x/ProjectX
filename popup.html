@@ -4,36 +4,36 @@
   <meta charset="utf-8">
   <style>
     body {
-      width: 380px;
-      height: 500px;
+      width: 320px; /* Reduced from 380px for smaller popup */
+      height: 450px; /* Reduced from 500px for smaller popup */
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       margin: 0;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, #000000 0%, #10b981 50%, #000000 100%); /* Updated to green gradient background */
       color: #e2e8f0;
       overflow: hidden;
       position: relative;
     }
     
     #auth-container {
-      display: none;
+      display: block; /* Show auth container by default */
       height: 100%;
       background: linear-gradient(135deg, #000000 0%, #10b981 50%, #000000 100%);
-      padding: 20px;
+      padding: 16px; /* Reduced padding for smaller popup */
       box-sizing: border-box;
     }
     
     .auth-header {
       text-align: center;
-      margin-bottom: 30px;
+      margin-bottom: 20px; /* Reduced margin for compact layout */
     }
     
     .auth-logo {
-      width: 64px;
-      height: 64px;
+      width: 48px; /* Reduced logo size */
+      height: 48px;
       background: rgba(255,255,255,0.2);
-      border-radius: 20px;
-      margin: 0 auto 16px;
+      border-radius: 16px; /* Reduced border radius */
+      margin: 0 auto 12px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -42,46 +42,46 @@
     }
     
     .auth-title {
-      font-size: 24px;
+      font-size: 20px; /* Reduced font size */
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       color: white;
     }
     
     .auth-subtitle {
       color: rgba(255,255,255,0.7);
-      font-size: 14px;
+      font-size: 13px; /* Reduced font size */
     }
     
     .auth-form {
       background: rgba(255,255,255,0.05);
-      border-radius: 16px;
-      padding: 24px;
+      border-radius: 12px; /* Reduced border radius */
+      padding: 16px; /* Reduced padding */
       border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
-      margin-bottom: 16px;
+      margin-bottom: 12px; /* Reduced margin */
     }
     
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 12px; /* Reduced margin */
     }
     
     .form-label {
       display: block;
-      font-size: 14px;
+      font-size: 13px; /* Reduced font size */
       font-weight: 600;
-      margin-bottom: 6px;
+      margin-bottom: 4px; /* Reduced margin */
       color: rgba(255,255,255,0.8);
     }
     
     .form-input {
       width: 100%;
-      padding: 12px 16px;
+      padding: 10px 12px; /* Reduced padding */
       border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px;
+      border-radius: 8px;
       background: rgba(255,255,255,0.1);
       color: white;
-      font-size: 14px;
+      font-size: 13px; /* Reduced font size */
       box-sizing: border-box;
       transition: all 0.2s;
     }
@@ -132,12 +132,12 @@
     }
     
     #main-content {
-      display: block;
+      display: none; /* Hidden by default, shown after auth */
     }
     
     .header {
       background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      padding: 20px;
+      padding: 16px; /* Reduced padding */
       text-align: center;
       position: relative;
       box-shadow: 0 4px 20px rgba(0,0,0,0.3);
@@ -218,9 +218,9 @@
     
     .tab-content {
       display: none;
-      padding: 20px;
-      height: calc(100% - 160px);
-      min-height: 280px;
+      padding: 16px; /* Reduced padding */
+      height: calc(100% - 140px); /* Adjusted height calculation */
+      min-height: 240px; /* Reduced min height */
       overflow-y: auto;
       flex: 1;
     }
@@ -692,12 +692,12 @@
   <div id="auth-container">
     <div class="auth-header">
       <div class="auth-logo">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2 class="auth-title">Welcome to Relay Chat</h2>
-      <p class="auth-subtitle">Create an account to get started</p>
+      <h2 class="auth-title">Relay Chat</h2>
+      <p class="auth-subtitle">Create account or sign in</p>
     </div>
 
     <div class="auth-form" id="registration-form">
@@ -719,7 +719,7 @@
       </div>
     </div>
 
-    <div class="auth-form" id="login-form" style="display: none;">
+    <div class="auth-form" id="login-form">
       <div class="form-group">
         <label class="form-label">Email Address</label>
         <input type="email" class="form-input" id="login-email" placeholder="your@email.com" required>
@@ -735,7 +735,7 @@
     </div>
   </div>
 
-  <div id="main-content" style="display: none;">
+  <div id="main-content">
     <div class="header">
       <div class="logo">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -777,14 +777,14 @@
         ⚠️ <strong>Security Warning:</strong> Write down your mnemonic phrase and store it safely. Never share it with anyone. You are responsible for your Bitcoin security.
       </div>
 
-      <div id="wallet-setup" style="display: none;">
+      <div id="wallet-setup">
         <div class="actions">
           <button class="primary-button" id="generate-wallet">Generate New Wallet</button>
           <button id="import-wallet">Import Existing Wallet</button>
         </div>
       </div>
 
-      <div id="wallet-display" style="display: none;">
+      <div id="wallet-display">
         <div class="stats">
           <div class="stat-item">
             <span class="stat-label">Status:</span>
@@ -828,7 +828,7 @@
         </div>
       </div>
 
-      <div id="mnemonic-display" style="display: none;">
+      <div id="mnemonic-display">
         <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #e2e8f0;">Your Mnemonic Phrase</h3>
         <div class="mnemonic-display" id="mnemonic-words"></div>
         <div class="actions">

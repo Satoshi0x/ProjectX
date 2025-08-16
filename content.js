@@ -1,5 +1,6 @@
 // Content script for Relay Chat Extension
 /* global chrome */
+/* eslint-env webextensions */
 
 class RelayContentScript {
   constructor() {
@@ -9,6 +10,7 @@ class RelayContentScript {
     this.popupVisible = false
     this.dragButton = null
     this.popupContainer = null
+    this.isOfflineMode = false // Added isOfflineMode flag
     this.init()
   }
 
@@ -55,9 +57,14 @@ class RelayContentScript {
     script.onload = () => {
       if (typeof window.io === "function") {
         try {
-          this.socket = window.io(this.serverUrl)
+          this.socket = window.io(this.serverUrl, {
+            transports: ["websocket", "polling"],
+            timeout: 5000,
+            forceNew: true,
+          })
           this.setupSocketListeners()
           this.joinRoom()
+          console.log("[Relay] Socket.IO initialized successfully")
         } catch (error) {
           console.error("[Relay] Failed to initialize Socket.IO:", error)
           this.handleSocketError()
@@ -67,8 +74,8 @@ class RelayContentScript {
         this.handleSocketError()
       }
     }
-    script.onerror = () => {
-      console.error("[Relay] Failed to load Socket.IO library")
+    script.onerror = (error) => {
+      console.error("[Relay] Failed to load Socket.IO library:", error)
       this.handleSocketError()
     }
     document.head.appendChild(script)
@@ -76,6 +83,7 @@ class RelayContentScript {
 
   handleSocketError() {
     console.warn("[Relay] Running in offline mode - Socket.IO features disabled")
+    this.isOfflineMode = true
     // Extension will still work for local features like draggable button
     // but real-time chat features will be disabled
   }
@@ -198,6 +206,21 @@ class RelayContentScript {
         min-height: 400px;
         max-height: 800px;
       }
+      
+      .relay-payment-notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        z-index: 10000;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 300px;
+        backdrop-filter: blur(10px);
+      }
     `
     document.head.appendChild(style)
   }
@@ -310,15 +333,14 @@ class RelayContentScript {
   }
 
   loadPopupContent() {
-    // This would load the actual popup HTML content
-    // For now, we'll create a simplified version
     this.popupContainer.innerHTML = `
       <div style="padding: 20px; color: white; height: 100%;">
-        <h2 style="margin: 0 0 20px 0; text-align: center;">Relay Chat</h2>
+        <h2 style="margin: 0 0 20px 0; text-align: center; color: #10b981;">Relay Chat</h2>
         <p style="text-align: center; margin-bottom: 20px;">Domain: ${this.domain}</p>
+        ${this.isOfflineMode ? '<p style="text-align: center; color: #f59e0b; font-size: 14px;">⚠️ Offline Mode</p>' : ""}
         <div style="text-align: center;">
           <button onclick="window.chrome.runtime.sendMessage({type: 'OPEN_FULL_POPUP'})" 
-                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                  style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
                          color: white; border: none; padding: 12px 24px; 
                          border-radius: 8px; cursor: pointer; font-weight: 600;">
             Open Full Extension
@@ -469,29 +491,14 @@ class RelayContentScript {
     const notification = document.createElement("div")
     notification.className = "relay-payment-notification"
     notification.innerHTML = `
-      <div style="
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: linear-gradient(135deg, #10b981, #059669);
-        color: white;
-        padding: 16px 20px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        z-index: 10000;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        max-width: 300px;
-        backdrop-filter: blur(10px);
-      ">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-          <span style="font-size: 20px;">✅</span>
-          <strong>Payment Successful!</strong>
-        </div>
-        <div style="font-size: 14px; opacity: 0.9;">
-          <div>Amount: ${amount} ${currency}</div>
-          <div style="margin-top: 4px; font-size: 12px; opacity: 0.8;">
-            TX: ${txid.substring(0, 8)}...
-          </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <span style="font-size: 20px;">✅</span>
+        <strong>Payment Successful!</strong>
+      </div>
+      <div style="font-size: 14px; opacity: 0.9;">
+        <div>Amount: ${amount} ${currency}</div>
+        <div style="margin-top: 4px; font-size: 12px; opacity: 0.8;">
+          TX: ${txid.substring(0, 8)}...
         </div>
       </div>
     `
